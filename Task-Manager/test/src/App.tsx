@@ -259,12 +259,12 @@ function App() {
     }
     */
 
-    updateDeadline(task, taskId, newDate, newDeadline);
+    updateDeadline(taskId, newDate, newDeadline);
     timersRef.current.set(task.id, taskCycleId);
     console.log("スケジュール時のMap", timersRef.current);
   };
   
-  const updateDeadline = (task: Task, taskId: string, newDate: string, newDeadline: string) => {
+  const updateDeadline = (taskId: string, newDate: string, newDeadline: string) => {
     console.log("締切の更新と表示を行います");
 
     setTasks((prevTasks) =>
@@ -380,29 +380,31 @@ function App() {
     <div>
       <h1>タスク管理アプリ</h1>
       <div>
-        <h3>通知済みのタスクを表示</h3>
-        <TaskList
-        tasks={notifiedTasks}
-        onDelete={deleteTask}
-        resetState={resetState}
-        taskName={taskName}
-        taskDeadlineDate={taskDeadlineDate}
-        taskDeadline={taskDeadline}
-        getTaskName={getTaskName}
-        getTaskDeadlineDate={getTaskDeadlineDate}
-        getTaskDeadline={getTaskDeadline}
-        getTaskCycle={getTaskCycle}
-        onUpdate={updateTask}
-        handleSetNotification={handleSetNotification}
-        makeTargetDate={makeTargetDate}
-        scheduleNotification={scheduleNotification}
-        getNextNotificationDate={getNextNotificationDate}
-        handleEdit={handleEdit}
-        />
+        {(notifiedTasks.length > 0) && (<h3>通知済みのタスクを表示</h3>)}
+        {(notifiedTasks.length > 0) && (
+          <TaskList
+            tasks={notifiedTasks}
+            onDelete={deleteTask}
+            resetState={resetState}
+            taskName={taskName}
+            taskDeadlineDate={taskDeadlineDate}
+            taskDeadline={taskDeadline}
+            getTaskName={getTaskName}
+            getTaskDeadlineDate={getTaskDeadlineDate}
+            getTaskDeadline={getTaskDeadline}
+            getTaskCycle={getTaskCycle}
+            onUpdate={updateTask}
+            handleSetNotification={handleSetNotification}
+            makeTargetDate={makeTargetDate}
+            scheduleNotification={scheduleNotification}
+            getNextNotificationDate={getNextNotificationDate}
+            handleEdit={handleEdit}
+          />
+        )}
       </div>
       <div>
-        {firstTasks && (<h3>最新のタスク</h3>)}
-        {firstTasks && (
+        {(notifiedTasks.length < 1)  && (<h3>最新のタスク</h3>)}
+        {(notifiedTasks.length < 1) && (
           <TaskList
             tasks={firstTasks}
             onDelete={deleteTask}
@@ -453,6 +455,7 @@ function App() {
     <div id="taskSettings" popover="manual">
       <div>
         <button
+          onClick={resetState}
           type="button"
           popoverTarget="taskSettings"
           popoverTargetAction="hide"
