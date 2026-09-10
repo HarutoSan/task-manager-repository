@@ -77,6 +77,8 @@ function App() {
   (task) => !firstTasks.includes(task)
   );
 
+  const notifiedTasks = sortedTasks.filter((task) => task.notified);
+
   const addTask = () => {
     console.log("こっちはaddTaskだよ")
     console.log(taskName);
@@ -193,6 +195,10 @@ function App() {
   const scheduleNotification = (task: Task, taskId: string, notificationDate: Date) => {
     console.log("スケジューリング開始", task.name);
 
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? { ...task, notified: false }: task));
+
     // ① 古いタイマーを取得
     const oldTimerId = timersRef.current.get(taskId);
 
@@ -223,6 +229,10 @@ function App() {
       new Notification("タスクの時間です", {
         body: `${task.name} の期限です`,
       });
+
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === taskId ? { ...task, notified: true }: task));
 
       /*
       if (task.cycle !== "none") {
@@ -257,18 +267,13 @@ function App() {
   const updateDeadline = (task: Task, taskId: string, newDate: string, newDeadline: string) => {
     console.log("締切の更新と表示を行います");
 
-    const newTask: Task = {
-      id: task.id,
-      name: task.name,
-      date: newDate,
-      deadline: newDeadline,
-      cycle: task.cycle
-    };
-
-    setTasks((prevTasks) => prevTasks.map((task) => (
-      task.id === taskId ? newTask : task)
-    ));
-  }
+    setTasks((prevTasks) =>
+      prevTasks.map((currentTask) =>
+        currentTask.id === taskId
+          ? {...currentTask,
+            date: newDate,
+            deadline: newDeadline}: currentTask));
+  };
 
   const handleSetNotification = async (task: Task) => {
     // 日付と時刻が入力されているか確認
@@ -323,6 +328,10 @@ function App() {
         body: `${task.name} の期限です`,
       });
 
+      setTasks((prevTasks) =>
+        prevTasks.map((prevtask) =>
+          prevtask.id === task.id ? { ...prevtask, notified: true }: prevtask));
+
       console.log("handleで通知を実行したよ", task.name, "現在時刻：", new Date());
     }, delay);
 
@@ -370,6 +379,27 @@ function App() {
     <>
     <div>
       <h1>タスク管理アプリ</h1>
+      <div>
+        <h3>通知済みのタスクを表示</h3>
+        <TaskList
+        tasks={notifiedTasks}
+        onDelete={deleteTask}
+        resetState={resetState}
+        taskName={taskName}
+        taskDeadlineDate={taskDeadlineDate}
+        taskDeadline={taskDeadline}
+        getTaskName={getTaskName}
+        getTaskDeadlineDate={getTaskDeadlineDate}
+        getTaskDeadline={getTaskDeadline}
+        getTaskCycle={getTaskCycle}
+        onUpdate={updateTask}
+        handleSetNotification={handleSetNotification}
+        makeTargetDate={makeTargetDate}
+        scheduleNotification={scheduleNotification}
+        getNextNotificationDate={getNextNotificationDate}
+        handleEdit={handleEdit}
+        />
+      </div>
       <div>
         {firstTasks && (<h3>最新のタスク</h3>)}
         {firstTasks && (

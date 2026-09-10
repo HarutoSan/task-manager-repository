@@ -7,6 +7,7 @@ type Task = {
     date: string;
     deadline: string;
     cycle: string;
+    notified: boolean;
 };
 
 type TaskSettingsProps = {

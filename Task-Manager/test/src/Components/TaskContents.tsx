@@ -6,6 +6,7 @@ type Task = {
     date: string;
     deadline: string;
     cycle: string;
+    notified: boolean;
 };
 
 type TaskSettingsProps = {
@@ -74,7 +75,6 @@ const TaskContents = ( {
         return (
         <>
         <div>
-            <p>id: {task.id}</p>
             <p>タスク名: {task.name}</p>
             <p>締切日: {task.date}</p>
             <p>時刻: {task.deadline}</p>
