@@ -1,7 +1,6 @@
 import { useState, useRef, type ChangeEvent } from "react";
 import { v4 as uuid } from "uuid";
 import TaskList from "./Components/TaskList";
-import TaskContents from "./Components/TaskContents";
 
 type Task = {
   id: string;
@@ -65,7 +64,17 @@ function App() {
     return dateA.getTime() - dateB.getTime();
   });
 
-  const [firstTask, ...remainingTasks] = sortedTasks;
+  const firstTask = sortedTasks[0];
+
+  const firstTasks = firstTask
+    ? sortedTasks.filter(
+      (task) =>
+        task.date === firstTask.date &&
+        task.deadline === firstTask.deadline): [];
+
+  const remainingTasks = sortedTasks.filter(
+  (task) => !firstTasks.includes(task)
+  );
 
   const addTask = () => {
     console.log("こっちはaddTaskだよ")
@@ -358,10 +367,10 @@ function App() {
     <div>
       <h1>タスク管理アプリ</h1>
       <div>
-        <h3>最新タスクを取得して表示</h3>
-        {firstTask && (
-          <TaskContents
-            task={firstTask}
+        {firstTasks && (<h3>最新のタスク</h3>)}
+        {firstTasks && (
+          <TaskList
+            tasks={firstTasks}
             onDelete={deleteTask}
             resetState={resetState}
             taskName={taskName}
