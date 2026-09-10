@@ -16,6 +16,7 @@ type TaskSettingsProps = {
     taskName: string;
     taskDeadlineDate: string;
     taskDeadline: string;
+    taskCycle: string;
     getTaskName: (event: ChangeEvent<HTMLInputElement>) => void;
     getTaskDeadlineDate: (event: ChangeEvent<HTMLInputElement>) => void;
     getTaskDeadline: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -35,6 +36,7 @@ const TaskContents = ( {
     taskName,
     taskDeadlineDate,
     taskDeadline,
+    taskCycle,
     getTaskName,
     getTaskDeadlineDate,
     getTaskDeadline,
@@ -154,7 +156,7 @@ const TaskContents = ( {
 
             <div>
                 <p>繰り返し周期</p>
-                <select onChange={getTaskCycle}>
+                <select value={taskCycle} onChange={getTaskCycle}>
                     <option value="none">繰り返しなし</option>
                     <option value="day">１日１回</option>
                     <option value="week">週１回</option>

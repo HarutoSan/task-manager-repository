@@ -17,6 +17,7 @@ type TaskSettingsProps = {
     taskName: string;
     taskDeadlineDate: string;
     taskDeadline: string;
+    taskCycle: string;
     getTaskName: (event: ChangeEvent<HTMLInputElement>) => void;
     getTaskDeadlineDate: (event: ChangeEvent<HTMLInputElement>) => void;
     getTaskDeadline: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -36,6 +37,7 @@ const TaskList = ( {
     taskName,
     taskDeadlineDate,
     taskDeadline,
+    taskCycle,
     getTaskName,
     getTaskDeadlineDate,
     getTaskDeadline,
@@ -56,6 +58,7 @@ const TaskList = ( {
         taskName={taskName}
         taskDeadlineDate={taskDeadlineDate}
         taskDeadline={taskDeadline}
+        taskCycle={taskCycle}
         getTaskName={getTaskName}
         getTaskDeadlineDate={getTaskDeadlineDate}
         getTaskDeadline={getTaskDeadline}

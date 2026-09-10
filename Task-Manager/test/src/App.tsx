@@ -29,10 +29,12 @@ function App() {
   };
 
   const handleEdit = (task: Task) => {
+    console.log(taskCycle);
     setTaskName(task.name);
     setTaskDeadlineDate(task.date);
     setTaskDeadline(task.deadline);
     setCycle(task.cycle);
+    console.log(taskCycle);
   };
 
   //入れ物に入力された内容を代入する
@@ -74,7 +76,7 @@ function App() {
         task.deadline === firstTask.deadline): [];
 
   const remainingTasks = sortedTasks.filter(
-  (task) => !firstTasks.includes(task)
+    (task) => !firstTasks.includes(task) && !task.notified
   );
 
   const notifiedTasks = sortedTasks.filter((task) => task.notified);
@@ -119,7 +121,7 @@ function App() {
       date: taskDeadlineDate,
       deadline: taskDeadline,
       cycle: taskCycle,
-      notified: false
+      notified: false,
     };
 
     setTasks((prevTasks) => prevTasks.map((task) => (
@@ -389,6 +391,7 @@ function App() {
             taskName={taskName}
             taskDeadlineDate={taskDeadlineDate}
             taskDeadline={taskDeadline}
+            taskCycle={taskCycle}
             getTaskName={getTaskName}
             getTaskDeadlineDate={getTaskDeadlineDate}
             getTaskDeadline={getTaskDeadline}
@@ -412,6 +415,7 @@ function App() {
             taskName={taskName}
             taskDeadlineDate={taskDeadlineDate}
             taskDeadline={taskDeadline}
+            taskCycle={taskCycle}
             getTaskName={getTaskName}
             getTaskDeadlineDate={getTaskDeadlineDate}
             getTaskDeadline={getTaskDeadline}
@@ -434,6 +438,7 @@ function App() {
         taskName={taskName}
         taskDeadlineDate={taskDeadlineDate}
         taskDeadline={taskDeadline}
+        taskCycle={taskCycle}
         getTaskName={getTaskName}
         getTaskDeadlineDate={getTaskDeadlineDate}
         getTaskDeadline={getTaskDeadline}
