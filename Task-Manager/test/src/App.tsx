@@ -8,6 +8,7 @@ type Task = {
   date: string;
   deadline: string;
   cycle: string;
+  notified: boolean;
 };
 
 function App() {
@@ -88,7 +89,8 @@ function App() {
       name: taskName,
       date: taskDeadlineDate,
       deadline: taskDeadline,
-      cycle: taskCycle
+      cycle: taskCycle,
+      notified: false,
     };
     
     setTasks((prevTasks) => {
@@ -114,7 +116,8 @@ function App() {
       name: taskName,
       date: taskDeadlineDate,
       deadline: taskDeadline,
-      cycle: taskCycle
+      cycle: taskCycle,
+      notified: false
     };
 
     setTasks((prevTasks) => prevTasks.map((task) => (
@@ -319,6 +322,7 @@ function App() {
       new Notification("タスクの時間です", {
         body: `${task.name} の期限です`,
       });
+
       console.log("handleで通知を実行したよ", task.name, "現在時刻：", new Date());
     }, delay);
 
