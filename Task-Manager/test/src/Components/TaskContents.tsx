@@ -86,7 +86,7 @@ const TaskContents = ( {
             <button onClick={() => onDelete(task.id)}>タスクを削除</button>
         </div>
 
-        <div id={`RefTaskComplete-${task.id}`} popover="">
+        <div id={`RefTaskComplete-${task.id}`} popover="manual">
             <div>
                 <button
                 type="button"
@@ -115,7 +115,7 @@ const TaskContents = ( {
             </div>
         </div>
 
-        <div id={`RefTaskSettings-${task.id}`} popover="">
+        <div id={`RefTaskSettings-${task.id}`} popover="manual">
             <div>
                 <button
                 onClick={resetState}

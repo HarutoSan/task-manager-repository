@@ -416,7 +416,7 @@ function App() {
       +
     </button>
 
-    <div id="taskSettings" popover="">
+    <div id="taskSettings" popover="manual">
       <div>
         <button
           type="button"
