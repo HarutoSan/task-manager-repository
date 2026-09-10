@@ -1,6 +1,7 @@
 import { useState, useRef, type ChangeEvent } from "react";
 import { v4 as uuid } from "uuid";
 import TaskList from "./Components/TaskList";
+import TaskContents from "./Components/TaskContents";
 
 type Task = {
   id: string;
@@ -62,7 +63,9 @@ function App() {
     const dateB = new Date(`${b.date}T${b.deadline}`);
 
     return dateA.getTime() - dateB.getTime();
-});
+  });
+
+  const [firstTask, ...remainingTasks] = sortedTasks;
 
   const addTask = () => {
     console.log("こっちはaddTaskだよ")
@@ -354,25 +357,50 @@ function App() {
     <>
     <div>
       <h1>タスク管理アプリ</h1>
-      <h3>最新タスクを取得して表示</h3>
-      <TaskList
-      tasks={sortedTasks}
-      onDelete={deleteTask}
-      resetState={resetState}
-      taskName={taskName}
-      taskDeadlineDate={taskDeadlineDate}
-      taskDeadline={taskDeadline}
-      getTaskName={getTaskName}
-      getTaskDeadlineDate={getTaskDeadlineDate}
-      getTaskDeadline={getTaskDeadline}
-      getTaskCycle={getTaskCycle}
-      onUpdate={updateTask}
-      handleSetNotification={handleSetNotification}
-      makeTargetDate={makeTargetDate}
-      scheduleNotification={scheduleNotification}
-      getNextNotificationDate={getNextNotificationDate}
-      handleEdit={handleEdit}
-      />
+      <div>
+        <h3>最新タスクを取得して表示</h3>
+        {firstTask && (
+          <TaskContents
+            task={firstTask}
+            onDelete={deleteTask}
+            resetState={resetState}
+            taskName={taskName}
+            taskDeadlineDate={taskDeadlineDate}
+            taskDeadline={taskDeadline}
+            getTaskName={getTaskName}
+            getTaskDeadlineDate={getTaskDeadlineDate}
+            getTaskDeadline={getTaskDeadline}
+            getTaskCycle={getTaskCycle}
+            onUpdate={updateTask}
+            handleSetNotification={handleSetNotification}
+            makeTargetDate={makeTargetDate}
+            scheduleNotification={scheduleNotification}
+            getNextNotificationDate={getNextNotificationDate}
+            handleEdit={handleEdit}
+          />
+        )}
+      </div>
+      <div>
+        <h3>残りのタスクを表示</h3>
+        <TaskList
+        tasks={remainingTasks}
+        onDelete={deleteTask}
+        resetState={resetState}
+        taskName={taskName}
+        taskDeadlineDate={taskDeadlineDate}
+        taskDeadline={taskDeadline}
+        getTaskName={getTaskName}
+        getTaskDeadlineDate={getTaskDeadlineDate}
+        getTaskDeadline={getTaskDeadline}
+        getTaskCycle={getTaskCycle}
+        onUpdate={updateTask}
+        handleSetNotification={handleSetNotification}
+        makeTargetDate={makeTargetDate}
+        scheduleNotification={scheduleNotification}
+        getNextNotificationDate={getNextNotificationDate}
+        handleEdit={handleEdit}
+        />
+      </div>
     </div>
 
     <button popoverTarget="taskSettings">
