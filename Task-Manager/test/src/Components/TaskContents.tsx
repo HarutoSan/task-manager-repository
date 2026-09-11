@@ -85,10 +85,10 @@ const TaskContents = ( {
                 <p>締切日時: {year}年{month}月{day}日（{getDayOfWeek(task.date)}） at {task.deadline}</p>
                 <p>繰り返し: {task.cycle}</p>
             </div>
-            <div>
-                <button onClick={() => handleComplete(task)}>タスクを完了</button>
-                <button onClick={() => handleEdit(task)} popoverTarget={`RefTaskSettings-${task.id}`}>タスクを編集</button>
-                <button onClick={() => onDelete(task.id)}>タスクを削除</button>
+            <div className="task-buttons">
+                <button className="task-button" onClick={() => handleComplete(task)}>タスクを完了</button>
+                <button className="task-button" onClick={() => handleEdit(task)} popoverTarget={`RefTaskSettings-${task.id}`}>タスクを編集</button>
+                <button className="task-button" onClick={() => onDelete(task.id)}>タスクを削除</button>
             </div>
         </div>
 

@@ -3,6 +3,18 @@
     margin-left: 10px;
 }
 
+.add-button {
+    position: fixed;
+    top: 55px;
+    right: 35px;
+    width: 45px;
+    height: 45px;
+    font-size: 28px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+
 /* 通知済タスクの設定*/
 #notifiedTasks .task-contents {
     font-size: 22px;

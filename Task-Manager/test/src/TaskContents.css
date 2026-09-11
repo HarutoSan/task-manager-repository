@@ -1,0 +1,31 @@
+.task-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.task-button {
+    background: linear-gradient(
+    135deg,
+    rgba(30, 75, 130, 0.9),
+    rgba(5, 25, 55, 0.9)
+    );
+
+    color: white;
+
+    border: 1px solid rgba(135, 197, 255, 0.5);
+    border-radius: 3px;
+
+    padding: 0px 10px;
+
+    font-size: 14px;
+
+    box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.35);
+
+    cursor: pointer;
+
+    transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}

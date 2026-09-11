@@ -382,6 +382,9 @@ function App() {
     <>
     <div>
       <h1 className="title">ToDoList</h1>
+      <button className="add-button" popoverTarget="taskSettings">
+      +
+    </button>
       <div id="notifiedTasks">
         {(notifiedTasks.length > 0) && (<h3 className="noti-h3">通知済タスク</h3>)}
         {(notifiedTasks.length > 0) && (
@@ -455,10 +458,6 @@ function App() {
         )}
       </div>
     </div>
-
-    <button popoverTarget="taskSettings">
-      +
-    </button>
 
     <div id="taskSettings" popover="manual">
       <div>
