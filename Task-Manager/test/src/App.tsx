@@ -262,6 +262,8 @@ function App() {
         body: `${task.name} の期限です`,
       });
 
+      playNotificationSound();
+
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === taskId ? { ...task, notified: true }: task));
@@ -322,6 +324,8 @@ function App() {
         body: `${task.name} の期限です`,
       });
 
+      playNotificationSound();
+
       setTasks((prevTasks) =>
         prevTasks.map((prevtask) =>
           prevtask.id === task.id ? { ...prevtask, notified: true }: prevtask));
@@ -365,6 +369,13 @@ function App() {
     console.log("タスクを削除しました");
   };
 
+  const playNotificationSound = () => {
+    const audio = new Audio("/notification.mp3");
+
+    audio.play().catch((error) => {
+      console.log("通知音を再生できませんでした:", error);
+    });
+  };
 
   return (
     <>
