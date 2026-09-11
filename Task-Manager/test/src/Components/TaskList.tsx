@@ -1,5 +1,6 @@
 import type { ChangeEvent } from "react";
 import TaskContents from "./TaskContents";
+import "../TaskList.css";
 
 type Task = {
     id: string;
@@ -11,6 +12,7 @@ type Task = {
 };
 
 type TaskSettingsProps = {
+    type: "notified" | "latest" | "remaining";
     tasks: Task[];
     onDelete: (taskId: string) => void;
     resetState: () => void;
@@ -31,6 +33,7 @@ type TaskSettingsProps = {
 }
 
 const TaskList = ( {
+    type,
     tasks,
     onDelete,
     resetState,
@@ -49,27 +52,32 @@ const TaskList = ( {
     getNextNotificationDate,
     handleEdit} : TaskSettingsProps ) => {
 
-    return tasks.map((task) => (
-    <TaskContents
-        key={task.id}
-        task={task}
-        onDelete={onDelete}
-        resetState={resetState}
-        taskName={taskName}
-        taskDeadlineDate={taskDeadlineDate}
-        taskDeadline={taskDeadline}
-        taskCycle={taskCycle}
-        getTaskName={getTaskName}
-        getTaskDeadlineDate={getTaskDeadlineDate}
-        getTaskDeadline={getTaskDeadline}
-        getTaskCycle={getTaskCycle}
-        onUpdate={onUpdate}
-        handleSetNotification={handleSetNotification}
-        makeTargetDate={makeTargetDate}
-        scheduleNotification={scheduleNotification}
-        getNextNotificationDate={getNextNotificationDate}
-        handleEdit={handleEdit}
-    />))
+    return (
+        <div className={`task-list ${type}`}>
+            {tasks.map((task) => (
+                <TaskContents
+                key={task.id}
+                task={task}
+                onDelete={onDelete}
+                resetState={resetState}
+                taskName={taskName}
+                taskDeadlineDate={taskDeadlineDate}
+                taskDeadline={taskDeadline}
+                taskCycle={taskCycle}
+                getTaskName={getTaskName}
+                getTaskDeadlineDate={getTaskDeadlineDate}
+                getTaskDeadline={getTaskDeadline}
+                getTaskCycle={getTaskCycle}
+                onUpdate={onUpdate}
+                handleSetNotification={handleSetNotification}
+                makeTargetDate={makeTargetDate}
+                scheduleNotification={scheduleNotification}
+                getNextNotificationDate={getNextNotificationDate}
+                handleEdit={handleEdit}
+                />))
+            }
+        </div>
+    );
 }
 
 export default TaskList

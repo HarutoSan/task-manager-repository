@@ -1,4 +1,5 @@
 import type { ChangeEvent } from "react";
+import "../TaskContents.css";
 
 type Task = {
     id: string;
@@ -78,7 +79,7 @@ const TaskContents = ( {
     
         return (
         <>
-        <div>
+        <div id="TaskContents">
             <p>タスク名: {task.name}</p>
             <p>締切日時: {year}年{month}月{day}日（{getDayOfWeek(task.date)}） at {task.deadline}</p>
             <p>繰り返し: {task.cycle}</p>

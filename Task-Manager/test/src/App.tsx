@@ -1,6 +1,7 @@
 import { useState, useRef, type ChangeEvent } from "react";
 import { v4 as uuid } from "uuid";
 import TaskList from "./Components/TaskList";
+import "./App.css";
 
 type Task = {
   id: string;
@@ -385,6 +386,7 @@ function App() {
         {(notifiedTasks.length > 0) && (<h3>通知済みのタスクを表示</h3>)}
         {(notifiedTasks.length > 0) && (
           <TaskList
+            type="notified"
             tasks={notifiedTasks}
             onDelete={deleteTask}
             resetState={resetState}
@@ -409,6 +411,7 @@ function App() {
         {(notifiedTasks.length < 1)  && (firstTasks.length > 0) && (<h3>最新のタスク</h3>)}
         {(notifiedTasks.length < 1) && (firstTasks.length > 0) && (
           <TaskList
+            type="latest"
             tasks={firstTasks}
             onDelete={deleteTask}
             resetState={resetState}
@@ -433,6 +436,7 @@ function App() {
         {(remainingTasks.length > 0)  && (<h3>残りのタスクを表示</h3>)}
         {(remainingTasks.length > 0) && (
           <TaskList
+            type="remaining"
             tasks={remainingTasks}
             onDelete={deleteTask}
             resetState={resetState}
@@ -507,7 +511,6 @@ function App() {
           <option value="year">年１回</option>
         </select>
       </div>
-
 
       <div>
         <button
