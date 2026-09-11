@@ -1,0 +1,78 @@
+.title {
+    color: white;
+    margin-left: 10px;
+}
+
+/* 通知済タスクの設定*/
+#notifiedTasks .task-contents {
+    font-size: 22px;
+    color: red;
+}
+
+#notifiedTasks .task-block {
+    border: 2px solid #000;
+    margin: 10px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    padding: 15px;
+    background: rgba(5, 20, 45, 0.75);
+}
+
+#notifiedTasks .noti-h3 {
+    font-size: 22px;
+    color: white;
+    margin-left: 10px;
+}
+/* 通知済タスクの設定*/
+
+
+
+
+
+/*最新のタスクの設定*/
+#latestTasks .task-contents {
+    font-size: 22px;
+    color: white;
+}
+
+#latestTasks .task-block {
+    border: 2px solid #000;
+    margin: 10px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    background: rgba(5, 20, 45, 0.75);
+}
+
+#latestTasks .late-h3 {
+    font-size: 22px;
+    color: white;
+    margin-left: 10px;
+}
+/*最新のタスクの設定*/
+
+
+
+
+
+/*残りのタスクの設定*/
+#remainingTasks .task-contents {
+    font-size: 16px;
+    color: white;
+}
+
+#remainingTasks .task-block {
+    border: 2px solid #000;
+    margin: 10px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    background: rgba(5, 20, 45, 0.75);
+}
+
+#remainingTasks .rema-h3 {
+    font-size: 22px;
+    color: white;
+    margin-left: 10px;
+}
+/*残りのタスクの設定*/

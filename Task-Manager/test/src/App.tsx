@@ -381,12 +381,11 @@ function App() {
   return (
     <>
     <div>
-      <h1>タスク管理アプリ</h1>
-      <div>
-        {(notifiedTasks.length > 0) && (<h3>通知済みのタスクを表示</h3>)}
+      <h1 className="title">ToDoList</h1>
+      <div id="notifiedTasks">
+        {(notifiedTasks.length > 0) && (<h3 className="noti-h3">通知済タスク</h3>)}
         {(notifiedTasks.length > 0) && (
           <TaskList
-            type="notified"
             tasks={notifiedTasks}
             onDelete={deleteTask}
             resetState={resetState}
@@ -407,11 +406,10 @@ function App() {
           />
         )}
       </div>
-      <div>
-        {(notifiedTasks.length < 1)  && (firstTasks.length > 0) && (<h3>最新のタスク</h3>)}
+      <div id="latestTasks">
+        {(notifiedTasks.length < 1)  && (firstTasks.length > 0) && (<h3 className="late-h3">最新タスク</h3>)}
         {(notifiedTasks.length < 1) && (firstTasks.length > 0) && (
           <TaskList
-            type="latest"
             tasks={firstTasks}
             onDelete={deleteTask}
             resetState={resetState}
@@ -432,11 +430,10 @@ function App() {
           />
         )}
       </div>
-      <div>
-        {(remainingTasks.length > 0)  && (<h3>残りのタスクを表示</h3>)}
+      <div id="remainingTasks">
+        {(remainingTasks.length > 0)  && (<h3 className="rema-h3">タスク</h3>)}
         {(remainingTasks.length > 0) && (
           <TaskList
-            type="remaining"
             tasks={remainingTasks}
             onDelete={deleteTask}
             resetState={resetState}
@@ -513,6 +510,7 @@ function App() {
       </div>
 
       <div>
+        <p> </p>
         <button
           onClick={addTask}
           type="button"

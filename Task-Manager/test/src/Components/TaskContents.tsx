@@ -79,15 +79,17 @@ const TaskContents = ( {
     
         return (
         <>
-        <div id="TaskContents">
-            <p>タスク名: {task.name}</p>
-            <p>締切日時: {year}年{month}月{day}日（{getDayOfWeek(task.date)}） at {task.deadline}</p>
-            <p>繰り返し: {task.cycle}</p>
-        </div>
-        <div>
-            <button onClick={() => handleComplete(task)}>タスクを完了</button>
-            <button onClick={() => handleEdit(task)} popoverTarget={`RefTaskSettings-${task.id}`}>タスクを編集</button>
-            <button onClick={() => onDelete(task.id)}>タスクを削除</button>
+        <div className="task-block">
+            <div className="task-contents">
+                <p>タスク名: {task.name}</p>
+                <p>締切日時: {year}年{month}月{day}日（{getDayOfWeek(task.date)}） at {task.deadline}</p>
+                <p>繰り返し: {task.cycle}</p>
+            </div>
+            <div>
+                <button onClick={() => handleComplete(task)}>タスクを完了</button>
+                <button onClick={() => handleEdit(task)} popoverTarget={`RefTaskSettings-${task.id}`}>タスクを編集</button>
+                <button onClick={() => onDelete(task.id)}>タスクを削除</button>
+            </div>
         </div>
 
         <div id={`RefTaskComplete-${task.id}`} popover="manual">
@@ -157,7 +159,7 @@ const TaskContents = ( {
             </div>
 
             <div>
-                <p>繰り返し周期</p>
+                <p>繰り返し</p>
                 <select value={taskCycle} onChange={getTaskCycle}>
                     <option value="none">繰り返しなし</option>
                     <option value="day">１日１回</option>
@@ -168,6 +170,7 @@ const TaskContents = ( {
             </div>
 
             <div>
+                <p></p>
                 <button
                 onClick={updateTask}
                 type="button"
