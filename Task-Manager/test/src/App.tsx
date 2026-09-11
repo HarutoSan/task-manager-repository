@@ -29,12 +29,10 @@ function App() {
   };
 
   const handleEdit = (task: Task) => {
-    console.log(taskCycle);
     setTaskName(task.name);
     setTaskDeadlineDate(task.date);
     setTaskDeadline(task.deadline);
     setCycle(task.cycle);
-    console.log(taskCycle);
   };
 
   //入れ物に入力された内容を代入する
@@ -82,12 +80,6 @@ function App() {
   const notifiedTasks = sortedTasks.filter((task) => task.notified);
 
   const addTask = () => {
-    console.log("こっちはaddTaskだよ")
-    console.log(taskName);
-    console.log(taskDeadlineDate);
-    console.log(taskDeadline);
-    console.log(taskCycle);
-
     const newTask: Task = {
       id: uuid(),
       name: taskName,
@@ -96,6 +88,27 @@ function App() {
       cycle: taskCycle,
       notified: false,
     };
+
+    if (newTask.name === "") {
+      alert("タスク名を入力してください");
+      return;
+    };
+
+    // ② 日付・時刻をチェック
+    if (!newTask.date || !newTask.deadline) {
+      alert("日付と時刻を入力してください");
+      return;
+    };
+
+    // ③ 通知時刻をチェック
+    const notificationDate = makeTargetDate(newTask);
+    const delay = notificationDate.getTime() - Date.now();
+
+    if (delay <= 0) {
+      alert("通知時刻を過ぎています");
+      return;
+    };
+    
     
     setTasks((prevTasks) => {
       return [...prevTasks, newTask];
@@ -104,15 +117,12 @@ function App() {
     handleSetNotification(newTask);
 
     resetState();
-  };
+    
+    const popover = document.getElementById("taskSettings");
+    popover?.hidePopover();
+    };
 
   const updateTask = (taskId: string) => {
-    console.log("こっちはupdateTaskだよ");
-    console.log(taskName);
-    console.log(taskDeadlineDate);
-    console.log(taskDeadline);
-    console.log(taskCycle);
-
     cancelNotification(taskId);
 
     const updatedTask: Task = {
@@ -124,13 +134,33 @@ function App() {
       notified: false,
     };
 
+    if (updatedTask.name === "") {
+      alert("タスク名を入力してください");
+      return false;
+    };
+
+    // ② 日付・時刻をチェック
+    if (!updatedTask.date || !updatedTask.deadline) {
+      alert("日付と時刻を入力してください");
+      return false;
+    };
+
+    // ③ 通知時刻をチェック
+    const notificationDate = makeTargetDate(updatedTask);
+    const delay = notificationDate.getTime() - Date.now();
+
+    if (delay <= 0) {
+      alert("通知時刻を過ぎています");
+      return false;
+    };
+
     setTasks((prevTasks) => prevTasks.map((task) => (
       task.id === taskId ? updatedTask : task)
     ));
 
     handleSetNotification(updatedTask);
 
-    resetState();
+    resetState();    
   };
 
   const getNextNotificationDate = (currentDate: Date, cycle: string): Date => {
@@ -236,30 +266,8 @@ function App() {
         prevTasks.map((task) =>
           task.id === taskId ? { ...task, notified: true }: task));
 
-      /*
-      if (task.cycle !== "none") {
-        const nextDate = getNextNotificationDate(
-          notificationDate,
-          task.cycle
-        );
-        console.log("多分最初のscheduleが続いてる？")
-        scheduleNotification(task, nextDate);
-      }
-      */
       console.log("scheduleで通知を実行したよ", task.name, "現在時刻：", new Date());
     }, delay);
-
-    /*
-    for (const [id, value] of timersRef.current) {
-      if (id === task.id) {
-        clearTimeout(value);
-        timersRef.current.set(task.id, taskCycleId);
-        //console.log(timersRef.current);
-      } else {
-        timersRef.current.set(task.id, taskCycleId);
-      }
-    }
-    */
 
     updateDeadline(taskId, newDate, newDeadline);
     timersRef.current.set(task.id, taskCycleId);
@@ -302,22 +310,6 @@ function App() {
       return;
     }
 
-    /*
-    // 指定した日時を作る
-    const [year, month, day] = task.date.split("-").map(Number);
-    const [hour, minute] = task.deadline.split(":").map(Number);
-
-    targetDate = new Date(
-      year,
-      month - 1,
-      day,
-      hour,
-      minute,
-      0,
-      0
-    );
-    */
-
     const targetDate = makeTargetDate(task);
 
     const delay = targetDate.getTime() - Date.now();
@@ -340,9 +332,6 @@ function App() {
     timersRef.current.set(task.id, taskCycleId);
 
     console.log("ハンドル時のMap", timersRef.current);
-
-    // 通知をスケジュールする
-    //scheduleNotification(task, targetDate);
   };
 
   const makeTargetDate = (task: Task): Date => {
@@ -406,8 +395,8 @@ function App() {
         )}
       </div>
       <div>
-        {(notifiedTasks.length < 1)  && (<h3>最新のタスク</h3>)}
-        {(notifiedTasks.length < 1) && (
+        {(notifiedTasks.length < 1)  && (firstTasks.length > 0) && (<h3>最新のタスク</h3>)}
+        {(notifiedTasks.length < 1) && (firstTasks.length > 0) && (
           <TaskList
             tasks={firstTasks}
             onDelete={deleteTask}
@@ -430,26 +419,28 @@ function App() {
         )}
       </div>
       <div>
-        <h3>残りのタスクを表示</h3>
-        <TaskList
-        tasks={remainingTasks}
-        onDelete={deleteTask}
-        resetState={resetState}
-        taskName={taskName}
-        taskDeadlineDate={taskDeadlineDate}
-        taskDeadline={taskDeadline}
-        taskCycle={taskCycle}
-        getTaskName={getTaskName}
-        getTaskDeadlineDate={getTaskDeadlineDate}
-        getTaskDeadline={getTaskDeadline}
-        getTaskCycle={getTaskCycle}
-        onUpdate={updateTask}
-        handleSetNotification={handleSetNotification}
-        makeTargetDate={makeTargetDate}
-        scheduleNotification={scheduleNotification}
-        getNextNotificationDate={getNextNotificationDate}
-        handleEdit={handleEdit}
-        />
+        {(remainingTasks.length > 0)  && (<h3>残りのタスクを表示</h3>)}
+        {(remainingTasks.length > 0) && (
+          <TaskList
+            tasks={remainingTasks}
+            onDelete={deleteTask}
+            resetState={resetState}
+            taskName={taskName}
+            taskDeadlineDate={taskDeadlineDate}
+            taskDeadline={taskDeadline}
+            taskCycle={taskCycle}
+            getTaskName={getTaskName}
+            getTaskDeadlineDate={getTaskDeadlineDate}
+            getTaskDeadline={getTaskDeadline}
+            getTaskCycle={getTaskCycle}
+            onUpdate={updateTask}
+            handleSetNotification={handleSetNotification}
+            makeTargetDate={makeTargetDate}
+            scheduleNotification={scheduleNotification}
+            getNextNotificationDate={getNextNotificationDate}
+            handleEdit={handleEdit}
+          />
+        )}
       </div>
     </div>
 
@@ -511,8 +502,6 @@ function App() {
         <button
           onClick={addTask}
           type="button"
-          popoverTarget="taskSettings"
-          popoverTargetAction="hide"
         >
           タスクを追加する
         </button>

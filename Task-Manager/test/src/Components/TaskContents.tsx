@@ -21,7 +21,7 @@ type TaskSettingsProps = {
     getTaskDeadlineDate: (event: ChangeEvent<HTMLInputElement>) => void;
     getTaskDeadline: (event: ChangeEvent<HTMLInputElement>) => void;
     getTaskCycle: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-    onUpdate: (taskId: string) => void;
+    onUpdate: (taskId: string) => boolean | void;
     handleSetNotification: (task: Task) => Promise<void>;
     makeTargetDate: (task: Task) => Date;
     scheduleNotification: (task: Task, taskId: string, notificationDate: Date) => void;
@@ -48,8 +48,11 @@ const TaskContents = ( {
     handleEdit} : TaskSettingsProps ) => {
 
     const updateTask = () => {
-        onUpdate(task.id);
-        resetState();
+        if (onUpdate(task.id) === false) {
+            return;
+        }
+        const popover = document.getElementById(`RefTaskSettings-${task.id}`);
+        popover?.hidePopover();
     };
 
     const handleComplete = (task: Task) => {
@@ -58,28 +61,26 @@ const TaskContents = ( {
             onDelete(task.id);
         } else {
             // 繰り返しあり → ポップアップを開く
-            const popover = document.getElementById(
-                `RefTaskComplete-${task.id}`
-            );
-        popover?.showPopover();
+            const popover = document.getElementById(`RefTaskComplete-${task.id}`);
+            popover?.showPopover();
         }
     };
 
-    /*
-    const handleEdit = (task: Task) => {
-        setTaskName(task.name);
-        setTaskDeadlineDate(task.date);
-        setTaskDeadline(task.deadline);
-        setCycle(task.cycle);
+    const getDayOfWeek = (dateString: string) => {
+        const date = new Date(dateString);
+
+        const days = ["日", "月", "火", "水", "木", "金", "土"];
+
+        return days[date.getDay()];
     };
-    */
+
+    const [year, month, day] = task.date.split("-").map(Number);
     
         return (
         <>
         <div>
             <p>タスク名: {task.name}</p>
-            <p>締切日: {task.date}</p>
-            <p>時刻: {task.deadline}</p>
+            <p>締切日時: {year}年{month}月{day}日（{getDayOfWeek(task.date)}） at {task.deadline}</p>
             <p>繰り返し: {task.cycle}</p>
         </div>
         <div>
@@ -169,8 +170,6 @@ const TaskContents = ( {
                 <button
                 onClick={updateTask}
                 type="button"
-                popoverTarget={`RefTaskSettings-${task.id}`}
-                popoverTargetAction="hide"
                 >
                     タスクを更新する
                 </button>
