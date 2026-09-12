@@ -13,7 +13,7 @@ type Task = {
 };
 
 function App() {
-  const MAX_TIMEOUT = 2147483647;
+  const MAX_TIMEOUT = 30 * 1000;
   //変数(入れ物)を用意する
   const [taskName, setTaskName] = useState("");
   const [taskDeadlineDate, setTaskDeadlineDate] = useState("");
@@ -241,10 +241,11 @@ function App() {
     // ② 古いタイマーが存在すればキャンセル
     if (oldTimerId !== undefined) {
       clearTimeout(oldTimerId);
+      timersRef.current.delete(taskId);
       console.log("古いタイマーをキャンセルしました");
     }
 
-    let delay = notificationDate.getTime() - Date.now();
+    let delay: number = notificationDate.getTime() - Date.now();
 
     if (delay <= 0) {
       console.log("通知時刻が過ぎているため、通知を再設定します。");
@@ -253,21 +254,29 @@ function App() {
       delay = notificationDate.getTime() - Date.now();
     };
 
-    const actualDelay = Math.min(delay, MAX_TIMEOUT);
 
-    
-    
+
     const newDate = `${notificationDate.getFullYear()}-${String(
       notificationDate.getMonth() + 1
-    ).padStart(2, "0")}-${String(notificationDate.getDate()).padStart(2, "0")}`;
-    
+    ).padStart(2, "0")}-${String(notificationDate.getDate()).padStart(2, "0")}`;   
     const newDeadline = `${String(notificationDate.getHours()).padStart(
       2,"0")}:${String(notificationDate.getMinutes()).padStart(2, "0")}`;
 
+    updateDeadline(taskId, newDate, newDeadline);
 
 
-    const taskCycleId = setTimeout(() => {
-      console.log("通知する直前の残り時間", delay);
+
+    let taskCycleId: ReturnType <typeof setTimeout>;
+
+    if (delay > MAX_TIMEOUT) {
+      console.log("遅延時間の上限を越えました。ネオスケジュールします。")
+      const remainedDelay = delay - MAX_TIMEOUT;
+
+      taskCycleId = setTimeout(() => {
+        neoScheduleNotification(task, taskId, remainedDelay);
+      }, MAX_TIMEOUT);
+    } else {
+      taskCycleId = setTimeout(() => {
       new Notification("タスクの時間です", {
         body: `${task.name} の期限です`,
       });
@@ -278,12 +287,87 @@ function App() {
         prevTasks.map((task) =>
           task.id === taskId ? { ...task, notified: true }: task));
 
+      timersRef.current.delete(taskId);
+
       console.log("scheduleで通知を実行したよ", task.name, "現在時刻：", new Date());
     }, delay);
+  }
 
-    updateDeadline(taskId, newDate, newDeadline);
+    //updateDeadline(taskId, newDate, newDeadline);
     timersRef.current.set(task.id, taskCycleId);
     console.log("スケジュール時のMap", timersRef.current);
+  };
+
+  const neoScheduleNotification = (task: Task, taskId: string, remainedDelay: number) => {
+    console.log("ネオスケジューリング開始", task.name);
+
+    /*
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? { ...task, notified: false }: task));
+    */
+
+    // ① 古いタイマーを取得
+    const oldTimerId = timersRef.current.get(taskId);
+
+    // ② 古いタイマーが存在すればキャンセル
+    if (oldTimerId !== undefined) {
+      clearTimeout(oldTimerId);
+      timersRef.current.delete(taskId);
+      console.log("ネオ古いタイマーをキャンセルしました");
+    }
+
+    //let delay = notificationDate.getTime() - Date.now();
+
+    /*
+    if (delay <= 0) {
+      console.log("通知時刻が過ぎているため、通知を再設定します。");
+      notificationDate = getNextFutureNotificationDate(notificationDate, task.cycle);
+      console.log("最終的な通知時刻:", notificationDate);
+      delay = notificationDate.getTime() - Date.now();
+    };
+    */
+
+    /*
+    const newDate = `${notificationDate.getFullYear()}-${String(
+      notificationDate.getMonth() + 1
+    ).padStart(2, "0")}-${String(notificationDate.getDate()).padStart(2, "0")}`;    
+    const newDeadline = `${String(notificationDate.getHours()).padStart(
+      2,"0")}:${String(notificationDate.getMinutes()).padStart(2, "0")}`;
+
+    updateDeadline(taskId, newDate, newDeadline);
+    */
+
+    let taskCycleId: ReturnType <typeof setTimeout>;
+
+    if (remainedDelay > MAX_TIMEOUT) {
+      const nextremainedDelay = remainedDelay - MAX_TIMEOUT;
+
+      taskCycleId = setTimeout(() => {
+        neoScheduleNotification(task, taskId, nextremainedDelay);
+      }, MAX_TIMEOUT);
+    } else {
+      taskCycleId = setTimeout(() => {
+        console.log("ネオスケジュールで通知を表示します");
+        new Notification("タスクの時間です", {
+        body: `${task.name} の期限です`,
+      });
+
+      playNotificationSound();
+
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === taskId ? { ...task, notified: true }: task));
+
+      timersRef.current.delete(taskId);
+
+      //console.log("neoScheduleで通知を実行したよ", task.name, "現在時刻：", new Date());
+    }, remainedDelay);
+  }
+
+    //updateDeadline(taskId, newDate, newDeadline);
+    timersRef.current.set(task.id, taskCycleId);
+    console.log("ネオスケジュール時のMap", timersRef.current);
   };
   
   const updateDeadline = (taskId: string, newDate: string, newDeadline: string) => {
