@@ -29,3 +29,152 @@
     transform 0.2s ease,
     box-shadow 0.2s ease;
 }
+
+/* タスク設定ポップアップ */
+[id^="RefTaskSettings-"] {
+    width: 380px;
+    width: 380px;
+    padding-top: 15px;
+    padding-right: 25px;
+    padding-bottom: 40px;
+    padding-left: 25px;
+    box-sizing: border-box;
+
+    box-sizing: border-box;
+
+    background: white;
+    color: #222;
+
+    border: 2px solid #333;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+
+/* ポップアップ内の説明 */
+[id^="RefTaskSettings-"] p {
+    margin: 15px 0 7px;
+
+    font-size: 16px;
+    font-weight: 500;
+}
+
+
+/* 入力欄共通 */
+[id^="RefTaskSettings-"] input {
+    box-sizing: border-box;
+
+    height: 42px;
+
+    padding: 8px 10px;
+
+    font-size: 16px;
+
+    border: 1px solid #999;
+    border-radius: 6px;
+}
+
+
+/* タスク名 */
+[id^="RefTaskSettings-"] input[type="text"] {
+    width: 100%;
+}
+
+
+/* 日付・時刻 */
+.datetime-inputs {
+    display: flex;
+    gap: 10px;
+
+    width: 100%;
+}
+
+
+/* 日付と時刻を同じ幅にする */
+.datetime-inputs input {
+    flex: 1;
+    min-width: 0;
+}
+
+
+/* セレクトボックス */
+[id^="RefTaskSettings-"] select {
+    width: 100%;
+    height: 42px;
+
+    padding: 0 10px;
+
+    font-size: 16px;
+
+    border: 1px solid #999;
+    border-radius: 6px;
+}
+
+
+/* ボタン */
+[id^="RefTaskSettings-"] button {
+    padding: 8px 14px;
+
+    font-size: 15px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+
+/* タスク追加ボタン */
+[id^="RefTaskSettings-"] button:last-child {
+    width: 100%;
+    height: 42px;
+
+    margin-top: 20px;
+}
+
+
+
+
+
+[id^="RefTaskComplete-"] {
+    width: 380px;
+
+    padding: 17px;
+
+    box-sizing: border-box;
+
+    background: white;
+    color: #222;
+
+    border: 2px solid #333;
+    border-radius: 10px;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+
+/* ボタン */
+[id^="RefTaskComplete-"] button {
+    height: 35px;
+
+    padding: 0px 18px;
+
+    font-size: 16px;
+
+    border: 1px solid #999;
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+
+/* はい・いいえを並べる */
+[id^="RefTaskComplete-"] > div:last-child {
+    display: flex;
+    gap: 10px;
+}
+
+
+/* はい・いいえを同じ幅にする */
+[id^="RefTaskComplete-"] > div:last-child button {
+    flex: 1;
+}

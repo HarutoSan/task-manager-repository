@@ -90,6 +90,8 @@ function App() {
       notified: false,
     };
 
+    console.log("date", newTask.date);
+
     if (newTask.name === "") {
       alert("タスク名を入力してください");
       return;
@@ -250,6 +252,8 @@ function App() {
       delay = notificationDate.getTime() - Date.now();
     };
 
+    console.log("通知までの時間", delay);
+
     const newDate = `${notificationDate.getFullYear()}-${String(
       notificationDate.getMonth() + 1
     ).padStart(2, "0")}-${String(notificationDate.getDate()).padStart(2, "0")}`;
@@ -258,7 +262,10 @@ function App() {
       "0"
     )}:${String(notificationDate.getMinutes()).padStart(2, "0")}`;
 
+    console.log(newDate);
+
     const taskCycleId = setTimeout(() => {
+      console.log("通知する直前の残り時間", delay);
       new Notification("タスクの時間です", {
         body: `${task.name} の期限です`,
       });
@@ -481,8 +488,8 @@ function App() {
         />
       </div>
 
-      <div>
-        <p>締切日時</p>
+      <p>締切日時</p>
+      <div className="datetime-inputs">
         <input
           type="date"
           id="taskDeadlineDate"

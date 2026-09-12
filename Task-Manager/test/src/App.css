@@ -15,9 +15,107 @@
     cursor: pointer;
 }
 
+/* タスク設定ポップアップ */
+[id^="taskSettings"] {
+    width: 380px;
+    padding-top: 15px;
+    padding-right: 25px;
+    padding-bottom: 40px;
+    padding-left: 25px;
+    box-sizing: border-box;
+
+    background: white;
+    color: #222;
+
+    border: 2px solid #333;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+
+/* ポップアップ内の説明 */
+[id^="taskSettings"] p {
+    margin: 15px 0 7px;
+
+    font-size: 16px;
+    font-weight: 500;
+}
+
+
+/* 入力欄共通 */
+[id^="taskSettings"] input {
+    box-sizing: border-box;
+
+    height: 42px;
+
+    padding: 8px 10px;
+
+    font-size: 16px;
+
+    border: 1px solid #999;
+    border-radius: 6px;
+}
+
+
+/* タスク名 */
+[id^="taskSettings"] input[type="text"] {
+    width: 100%;
+}
+
+
+/* 日付・時刻 */
+.datetime-inputs {
+    display: flex;
+    gap: 10px;
+
+    width: 100%;
+}
+
+
+/* 日付と時刻を同じ幅にする */
+.datetime-inputs input {
+    flex: 1;
+    min-width: 0;
+}
+
+
+/* セレクトボックス */
+[id^="taskSettings"] select {
+    width: 100%;
+    height: 42px;
+
+    padding: 0 10px;
+
+    font-size: 16px;
+
+    border: 1px solid #999;
+    border-radius: 6px;
+}
+
+
+/* ボタン */
+[id^="taskSettings"] button {
+    padding: 8px 14px;
+
+    font-size: 15px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+
+/* タスク追加ボタン */
+[id^="taskSettings"] button:last-child {
+    width: 100%;
+    height: 42px;
+
+    margin-top: 20px;
+}
+
 /* 通知済タスクの設定*/
 #notifiedTasks .task-contents {
-    font-size: 22px;
+    font-size: 25px;
     color: red;
 }
 
@@ -26,7 +124,10 @@
     margin: 10px;
     border-radius: 15px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-    padding: 15px;
+    padding-top: 15px;
+    padding-right: 15px;
+    padding-bottom: 30px;
+    padding-left: 20px;
     background: rgba(5, 20, 45, 0.75);
 }
 
@@ -43,7 +144,7 @@
 
 /*最新のタスクの設定*/
 #latestTasks .task-contents {
-    font-size: 22px;
+    font-size: 25px;
     color: white;
 }
 
@@ -52,7 +153,10 @@
     margin: 10px;
     border-radius: 15px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    padding: 15px;
+    padding-top: 18px;
+    padding-right: 15px;
+    padding-bottom: 30px;
+    padding-left: 20px;
     background: rgba(5, 20, 45, 0.75);
 }
 
@@ -78,7 +182,10 @@
     margin: 10px;
     border-radius: 15px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    padding: 15px;
+    padding-top: 0px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+    padding-left: 20px;
     background: rgba(5, 20, 45, 0.75);
 }
 

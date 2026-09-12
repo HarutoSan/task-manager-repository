@@ -102,8 +102,8 @@ const TaskContents = ( {
                 </button>
             </div>
             
+            <p>タスクを繰り返しますか？</p>
             <div>
-                <p>タスクを繰り返しますか？</p>
                 <button
                 onClick={() => scheduleNotification(task, task.id, getNextNotificationDate(makeTargetDate(task), task.cycle))}
                 type="button"
@@ -142,8 +142,8 @@ const TaskContents = ( {
                 />
             </div>
 
-            <div>
-                <p>締切日時</p>
+            <p>締切日時</p>
+            <div className="datetime-inputs">
                 <input
                 type="date"
                 id="taskDeadlineDate"
