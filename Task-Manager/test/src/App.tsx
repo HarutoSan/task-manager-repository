@@ -13,7 +13,7 @@ type Task = {
 };
 
 function App() {
-  const MAX_TIMEOUT = 30 * 1000;
+  const MAX_TIMEOUT = 2147483647;
   //変数(入れ物)を用意する
   const [taskName, setTaskName] = useState("");
   const [taskDeadlineDate, setTaskDeadlineDate] = useState("");
@@ -270,7 +270,7 @@ function App() {
 
     if (delay > MAX_TIMEOUT) {
       console.log("遅延時間の上限を越えました。ネオスケジュールします。")
-      const remainedDelay = delay - MAX_TIMEOUT;
+      const remainedDelay: number = delay - MAX_TIMEOUT;
 
       taskCycleId = setTimeout(() => {
         neoScheduleNotification(task, taskId, remainedDelay);
@@ -287,13 +287,15 @@ function App() {
         prevTasks.map((task) =>
           task.id === taskId ? { ...task, notified: true }: task));
 
+      //すでに通知済なのでキャンセルするときにIDは必要ない
       timersRef.current.delete(taskId);
 
       console.log("scheduleで通知を実行したよ", task.name, "現在時刻：", new Date());
-    }, delay);
-  }
+      }, delay);
+    };
 
     //updateDeadline(taskId, newDate, newDeadline);
+    //ifのどちらでも通知がキャンセルされたとき用にタイマーIDをセットする必要がある
     timersRef.current.set(task.id, taskCycleId);
     console.log("スケジュール時のMap", timersRef.current);
   };
@@ -312,9 +314,8 @@ function App() {
 
     // ② 古いタイマーが存在すればキャンセル
     if (oldTimerId !== undefined) {
-      clearTimeout(oldTimerId);
       timersRef.current.delete(taskId);
-      console.log("ネオ古いタイマーをキャンセルしました");
+      console.log("ネオ古いタイマーIDを削除しました");
     }
 
     //let delay = notificationDate.getTime() - Date.now();
