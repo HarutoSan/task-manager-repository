@@ -13,6 +13,7 @@ type Task = {
 };
 
 function App() {
+  const MAX_TIMEOUT = 2147483647;
   //変数(入れ物)を用意する
   const [taskName, setTaskName] = useState("");
   const [taskDeadlineDate, setTaskDeadlineDate] = useState("");
@@ -252,17 +253,18 @@ function App() {
       delay = notificationDate.getTime() - Date.now();
     };
 
-    console.log("通知までの時間", delay);
+    const actualDelay = Math.min(delay, MAX_TIMEOUT);
 
+    
+    
     const newDate = `${notificationDate.getFullYear()}-${String(
       notificationDate.getMonth() + 1
     ).padStart(2, "0")}-${String(notificationDate.getDate()).padStart(2, "0")}`;
+    
     const newDeadline = `${String(notificationDate.getHours()).padStart(
-      2,
-      "0"
-    )}:${String(notificationDate.getMinutes()).padStart(2, "0")}`;
+      2,"0")}:${String(notificationDate.getMinutes()).padStart(2, "0")}`;
 
-    console.log(newDate);
+
 
     const taskCycleId = setTimeout(() => {
       console.log("通知する直前の残り時間", delay);
