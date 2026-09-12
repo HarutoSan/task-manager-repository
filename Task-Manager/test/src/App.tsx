@@ -14,6 +14,7 @@ type Task = {
 
 function App() {
   const MAX_TIMEOUT = 2147483647;
+  //const MAX_TIMEOUT = 30 * 1000;
   //変数(入れ物)を用意する
   const [taskName, setTaskName] = useState("");
   const [taskDeadlineDate, setTaskDeadlineDate] = useState("");
@@ -383,12 +384,6 @@ function App() {
   };
 
   const handleSetNotification = async (task: Task) => {
-    // 日付と時刻が入力されているか確認
-    if (!task.date || !task.deadline) {
-      alert("日付と時刻を入力してください");
-      return;
-    }
-
     // 通知機能が使えるか確認
     if (!("Notification" in window)) {
       alert("このブラウザは通知に対応していません");
@@ -414,6 +409,7 @@ function App() {
     console.log("現在:", new Date());
     console.log("通知時刻:", targetDate);
 
+    /*
     const taskCycleId = setTimeout(() => {
       new Notification("タスクの時間です", {
         body: `${task.name} の期限です`,
@@ -431,6 +427,40 @@ function App() {
     timersRef.current.set(task.id, taskCycleId);
 
     console.log("ハンドル時のMap", timersRef.current);
+    */
+
+    let taskCycleId: ReturnType <typeof setTimeout>;
+
+    if (delay > MAX_TIMEOUT) {
+      console.log("遅延時間の上限を越えました。ネオスケジュールします。")
+      const remainedDelay: number = delay - MAX_TIMEOUT;
+
+      taskCycleId = setTimeout(() => {
+        neoScheduleNotification(task, task.id, remainedDelay);
+      }, MAX_TIMEOUT);
+    } else {
+      taskCycleId = setTimeout(() => {
+      new Notification("タスクの時間です", {
+        body: `${task.name} の期限です`,
+      });
+
+      playNotificationSound();
+
+      setTasks((prevTasks) =>
+        prevTasks.map((prevtask) =>
+          prevtask.id === task.id ? { ...task, notified: true }: prevtask));
+
+      //すでに通知済なのでキャンセルするときにIDは必要ない
+      timersRef.current.delete(task.id);
+
+      console.log("scheduleで通知を実行したよ", task.name, "現在時刻：", new Date());
+      }, delay);
+    };
+
+    //updateDeadline(taskId, newDate, newDeadline);
+    //ifのどちらでも通知がキャンセルされたとき用にタイマーIDをセットする必要がある
+    timersRef.current.set(task.id, taskCycleId);
+    console.log("スケジュール時のMap", timersRef.current);
   };
 
   const makeTargetDate = (task: Task): Date => {
@@ -454,8 +484,10 @@ function App() {
 
   const cancelNotification = (taskId: string) => {
     const taskCycleId = timersRef.current.get(taskId);
-    clearTimeout(taskCycleId);
-    timersRef.current.delete(taskId);  
+    if (taskCycleId !== undefined) {
+      clearTimeout(taskCycleId);
+      timersRef.current.delete(taskId);  
+    };
   };
   
   const deleteTask = (taskId: string) => {
