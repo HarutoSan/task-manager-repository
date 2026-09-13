@@ -1,3 +1,4 @@
+//これからローカルストレージを実装する
 import type { ChangeEvent } from "react";
 import TaskContents from "./TaskContents";
 

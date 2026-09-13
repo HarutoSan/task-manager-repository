@@ -1,3 +1,4 @@
+//これからローカルストレージを実装する
 import { useState, useRef, type ChangeEvent } from "react";
 import { v4 as uuid } from "uuid";
 import TaskList from "./Components/TaskList";
