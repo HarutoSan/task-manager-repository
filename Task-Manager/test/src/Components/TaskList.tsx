@@ -1,4 +1,3 @@
-//これからローカルストレージを実装する
 import type { ChangeEvent } from "react";
 import TaskContents from "./TaskContents";
 
@@ -13,7 +12,7 @@ type Task = {
 
 type TaskSettingsProps = {
     tasks: Task[];
-    onDelete: (taskId: string) => void;
+    deleteTask: (task: Task) => void;
     resetState: () => void;
     taskName: string;
     taskDeadlineDate: string;
@@ -23,17 +22,17 @@ type TaskSettingsProps = {
     getTaskDeadlineDate: (event: ChangeEvent<HTMLInputElement>) => void;
     getTaskDeadline: (event: ChangeEvent<HTMLInputElement>) => void;
     getTaskCycle: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-    onUpdate: (taskId: string) => boolean | void;
+    updateTask: (task: Task) => boolean | void;
     handleSetNotification: (task: Task) => Promise<void>;
     makeTargetDate: (task: Task) => Date;
-    scheduleNotification: (task: Task, taskId: string, notificationDate: Date) => void;
+    scheduleNotification: (task: Task, notificationDate: Date) => void;
     getNextNotificationDate: (currentDate: Date, cycle: string) => Date;
     handleEdit: (task: Task) => void;
 }
 
 const TaskList = ( {
     tasks,
-    onDelete,
+    deleteTask,
     resetState,
     taskName,
     taskDeadlineDate,
@@ -43,7 +42,7 @@ const TaskList = ( {
     getTaskDeadlineDate,
     getTaskDeadline,
     getTaskCycle,
-    onUpdate,
+    updateTask,
     handleSetNotification,
     makeTargetDate,
     scheduleNotification,
@@ -54,7 +53,7 @@ const TaskList = ( {
     <TaskContents
         key={task.id}
         task={task}
-        onDelete={onDelete}
+        deleteTask={deleteTask}
         resetState={resetState}
         taskName={taskName}
         taskDeadlineDate={taskDeadlineDate}
@@ -64,7 +63,7 @@ const TaskList = ( {
         getTaskDeadlineDate={getTaskDeadlineDate}
         getTaskDeadline={getTaskDeadline}
         getTaskCycle={getTaskCycle}
-        onUpdate={onUpdate}
+        updateTask={updateTask}
         handleSetNotification={handleSetNotification}
         makeTargetDate={makeTargetDate}
         scheduleNotification={scheduleNotification}

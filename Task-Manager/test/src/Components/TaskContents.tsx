@@ -1,4 +1,3 @@
-//これからローカルストレージを実装する
 import type { ChangeEvent } from "react";
 import "../TaskContents.css";
 
@@ -13,7 +12,7 @@ type Task = {
 
 type TaskSettingsProps = {
     task: Task;
-    onDelete: (taskId: string) => void;
+    deleteTask: (task: Task) => void;
     resetState: () => void;
     taskName: string;
     taskDeadlineDate: string;
@@ -23,17 +22,17 @@ type TaskSettingsProps = {
     getTaskDeadlineDate: (event: ChangeEvent<HTMLInputElement>) => void;
     getTaskDeadline: (event: ChangeEvent<HTMLInputElement>) => void;
     getTaskCycle: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-    onUpdate: (taskId: string) => boolean | void;
+    updateTask: (task: Task) => boolean | void;
     handleSetNotification: (task: Task) => Promise<void>;
     makeTargetDate: (task: Task) => Date;
-    scheduleNotification: (task: Task, taskId: string, notificationDate: Date) => void;
+    scheduleNotification: (task: Task, notificationDate: Date) => void;
     getNextNotificationDate: (currentDate: Date, cycle: string) => Date;
     handleEdit: (task: Task) => void;
 }
 
 const TaskContents = ( {
     task,
-    onDelete,
+    deleteTask,
     resetState,
     taskName,
     taskDeadlineDate,
@@ -43,41 +42,35 @@ const TaskContents = ( {
     getTaskDeadlineDate,
     getTaskDeadline,
     getTaskCycle,
-    onUpdate,
+    updateTask,
     makeTargetDate,
     scheduleNotification,
     getNextNotificationDate,
     handleEdit} : TaskSettingsProps ) => {
 
-    const updateTask = () => {
-        if (onUpdate(task.id) === false) {
-            return;
-        }
-        const popover = document.getElementById(`RefTaskSettings-${task.id}`);
-        popover?.hidePopover();
-    };
+        //画面にカスタマイズして表示するために分割代入する
+        const [year, month, day] = task.date.split("-").map(Number);
 
-    const handleComplete = (task: Task) => {
-        if (task.cycle === "none") {
-            // 繰り返しなし → ポップアップを開かずに削除
-            onDelete(task.id);
-        } else {
-            // 繰り返しあり → ポップアップを開く
-            const popover = document.getElementById(`RefTaskComplete-${task.id}`);
-            popover?.showPopover();
-        }
-    };
 
-    const getDayOfWeek = (dateString: string) => {
-        const date = new Date(dateString);
 
-        const days = ["日", "月", "火", "水", "木", "金", "土"];
+        //繰り返しなしのタスクはタスクの繰り返し確認ポップアップ画面を開かずにそのまま削除する
+        const handleComplete = (task: Task) => {
+            if (task.cycle === "none") {
+                deleteTask(task);
+            } else {
+                const popover = document.getElementById(`RefTaskComplete-${task.id}`);
+                popover?.showPopover();
+            }
+        };
 
-        return days[date.getDay()];
-    };
-
-    const [year, month, day] = task.date.split("-").map(Number);
     
+    
+        //締切日時の曜日を取得する
+        const getDayOfWeek = (dateString: string) => {
+            const date = new Date(dateString);
+            const days = ["日", "月", "火", "水", "木", "金", "土"];
+            return days[date.getDay()];
+        };
         return (
         <>
         <div className="task-block">
@@ -89,7 +82,7 @@ const TaskContents = ( {
             <div className="task-buttons">
                 <button className="task-button" onClick={() => handleComplete(task)}>タスクを完了</button>
                 <button className="task-button" onClick={() => handleEdit(task)} popoverTarget={`RefTaskSettings-${task.id}`}>タスクを編集</button>
-                <button className="task-button" onClick={() => onDelete(task.id)}>タスクを削除</button>
+                <button className="task-button" onClick={() => deleteTask(task)}>タスクを削除</button>
             </div>
         </div>
 
@@ -106,14 +99,14 @@ const TaskContents = ( {
             <p>タスクを繰り返しますか？</p>
             <div>
                 <button
-                onClick={() => scheduleNotification(task, task.id, getNextNotificationDate(makeTargetDate(task), task.cycle))}
+                onClick={() => scheduleNotification(task, getNextNotificationDate(makeTargetDate(task), task.cycle))}
                 type="button"
                 popoverTarget={`RefTaskComplete-${task.id}`}
                 popoverTargetAction="hide"
                 >はい
                 </button>
                 <button
-                onClick={() => onDelete(task.id)}
+                onClick={() => deleteTask(task)}
                 type="button"
                 popoverTarget={`RefTaskComplete-${task.id}`}
                 popoverTargetAction="hide"
@@ -173,7 +166,7 @@ const TaskContents = ( {
             <div>
                 <p></p>
                 <button
-                onClick={updateTask}
+                onClick={() => updateTask(task)}
                 type="button"
                 >
                     タスクを更新する
