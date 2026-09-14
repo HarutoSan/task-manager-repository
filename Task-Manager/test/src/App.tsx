@@ -42,7 +42,6 @@ function App() {
 
   useEffect(() => {
     const reLoadScreenAuto = () => {
-      console.log("リロードテスト");
       whenStartBrowserCheckTask();
     };
 
@@ -127,7 +126,6 @@ function App() {
   --------------------------------------------------*/
 
   const whenStartBrowserCheckTask = () => {
-    console.log("立ち上げ時のMap：", timersRef.current);
     const savedLocalStrageTasks = localStorage.getItem("tasks");
     
     //ローカルストレージにtasksがないときは何もせずに終了
