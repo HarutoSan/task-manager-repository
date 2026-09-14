@@ -42,7 +42,7 @@ function App() {
     localStorage.setItem("tasks",JSON.stringify(tasks));}, [tasks]);
 
   //立ち上げ時に一度だけ実行する手続き
-    useEffect(() => {
+  useEffect(() => {
     const reLoadScreenAuto = () => {
       whenStartBrowserCheckTask();
     };
