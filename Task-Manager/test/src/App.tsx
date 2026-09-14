@@ -432,8 +432,6 @@ function App() {
       );
     };
 
-  console.log("getNextNotificationDateで作った日時:", nextDate);
-
   return nextDate;
   };
 
@@ -451,7 +449,7 @@ function App() {
   
   //タスクを繰り返したときに画面の締切日時を更新するか
   const updateDeadline = (taskId: string, newDate: string, newDeadline: string) => {
-    //tasksの更新したタスクのdateとdeadlineを更新する
+    //更新したタスクのdateとdeadlineを更新する
     setTasks((prevTasks) =>
       prevTasks.map((currentTask) =>
         currentTask.id === taskId
