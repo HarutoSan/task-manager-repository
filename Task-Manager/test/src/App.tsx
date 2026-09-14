@@ -28,16 +28,75 @@ function App() {
 
   //タスクの根源
   const [tasks, setTasks] = useState<Task[]>(() => {
-    const savedTasks = localStorage.getItem("tasks");
+    const savedLocalStrageTasks = localStorage.getItem("tasks");
 
-    if (savedTasks) {
-      return JSON.parse(savedTasks);
+    if (savedLocalStrageTasks) {
+      return JSON.parse(savedLocalStrageTasks);
     };
     return [];
   });
 
   useEffect(() => {
     localStorage.setItem("tasks",JSON.stringify(tasks));}, [tasks]);
+
+  useEffect(() => {
+    console.log("立ち上げ時のMap：", timersRef.current);
+    const savedLocalStrageTasks = localStorage.getItem("tasks");
+    
+    if (!savedLocalStrageTasks) {
+      return;
+    }
+
+    if (savedLocalStrageTasks) {
+      const savedTasks: Task[] = JSON.parse(savedLocalStrageTasks);
+
+      savedTasks.map((savedTask) => {        
+        const targetDate = makeTargetDate(savedTask);
+        const delay = targetDate.getTime() - Date.now();
+
+        if (delay <= 0) {
+          setTasks((prevTasks) =>
+            prevTasks.map((prevTask) =>
+              prevTask.id === savedTask.id ? { ...savedTask, notified: true }: prevTask));
+          return;
+        };
+
+        if (delay > 0) {
+          let taskCycleId: ReturnType <typeof setTimeout>;
+
+          if (delay > MAX_TIMEOUT) {
+            //MAX_TIMEOUT時間だけ経ったあとの残り時間を計算する
+            const remainedDelay: number = delay - MAX_TIMEOUT;
+
+            taskCycleId = setTimeout(() => {
+              //setTimeout関数を用いてMAX_TIMEOUT時間経った後に残り時間をネオスケジュールに渡す
+              neoScheduleNotification(savedTask, remainedDelay);
+            }, MAX_TIMEOUT);
+          } else {
+            //残り時間がMAX_TIMEOUTを超えていないときは通知を設定する
+            taskCycleId = setTimeout(() => {
+              new Notification("タスクの時間です", {
+              body: `${savedTask.name} の期限です`,
+            });
+
+            playNotificationSound();
+
+            //通知を行ったタスクのnotifiedを通知済にする
+            setTasks((prevTasks) =>
+              prevTasks.map((prevTask) =>
+                prevTask.id === savedTask.id ? { ...savedTask, notified: true }: prevTask));
+
+            //通知を行ったあとはキャンセルすることなはいのでMapkからタイマーIDを削除する
+            timersRef.current.delete(savedTask.id);
+            }, delay);
+          };
+
+          //ifのどちらでも通知がキャンセルされたとき用にタイマーIDをセットする必要がある
+          timersRef.current.set(savedTask.id, taskCycleId);
+        };
+      });
+    };
+  }, []);
 
   //tasksを締切順でソートしたタスク
   const sortedTasks = [...tasks].sort((a, b) => {
@@ -245,6 +304,7 @@ function App() {
 
     //ifのどちらでも通知がキャンセルされたとき用にタイマーIDをセットする必要がある
     timersRef.current.set(task.id, taskCycleId);
+    //console.log("ハンドル時のMap：", timersRef.current);
   };
   
   
@@ -302,6 +362,7 @@ function App() {
 
     //ifのどちらでも通知がキャンセルされたとき用にタイマーIDをセットする必要がある
     timersRef.current.set(task.id, taskCycleId);
+    //console.log("スケジュール時のMap：", timersRef.current);
   };
 
   
@@ -338,6 +399,7 @@ function App() {
 
     //いつでもタイマーをキャンセルできるようにここでもMapにタイマーIDを保存する
     timersRef.current.set(task.id, taskCycleId);
+    //console.log("ネオスケジュール時のMap：", timersRef.current);
   };
 
   /*------------------------------------------------
