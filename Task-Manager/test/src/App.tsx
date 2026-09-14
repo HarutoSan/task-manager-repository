@@ -37,20 +37,22 @@ function App() {
     return [];
   });
 
+  //tasksの変更をローカルストレージにも反映する
   useEffect(() => {
     localStorage.setItem("tasks",JSON.stringify(tasks));}, [tasks]);
 
-  useEffect(() => {
+  //立ち上げ時に一度だけ実行する手続き
+    useEffect(() => {
     const reLoadScreenAuto = () => {
       whenStartBrowserCheckTask();
     };
 
+    //タブに移動するとreLoadScreenAutoを実行する
     window.addEventListener("focus", reLoadScreenAuto);
-    document.addEventListener("visibilitychange", reLoadScreenAuto);
 
+    //別のタブに移動するとフォーカスを失うとする
     return () => {
       window.removeEventListener("focus", reLoadScreenAuto);
-      document.removeEventListener("visibilitychange", reLoadScreenAuto);
     };
   }, []);
 
@@ -125,6 +127,7 @@ function App() {
   メインとなる関数
   --------------------------------------------------*/
 
+  //タブに移動したときにローカルストレージを読み直して通知を設定する
   const whenStartBrowserCheckTask = () => {
     const savedLocalStrageTasks = localStorage.getItem("tasks");
     
@@ -370,7 +373,7 @@ function App() {
     const nextDate = new Date(currentDate);
 
     if (cycle === "day") {
-      nextDate.setMinutes(nextDate.getMinutes() + 1);
+      nextDate.setDate(nextDate.getDate() + 1);
     }
     else if (cycle === "week") {
       nextDate.setDate(nextDate.getDate() + 7);
