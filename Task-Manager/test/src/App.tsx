@@ -44,17 +44,22 @@ function App() {
     console.log("立ち上げ時のMap：", timersRef.current);
     const savedLocalStrageTasks = localStorage.getItem("tasks");
     
+    //ローカルストレージにtasksがないときは何もせずに終了
     if (!savedLocalStrageTasks) {
       return;
     }
 
+    //tasksがあるときは各タスクの通知を再設定する
     if (savedLocalStrageTasks) {
       const savedTasks: Task[] = JSON.parse(savedLocalStrageTasks);
 
+      //立ち上げた時刻から締切までの時間を計算する
+      //map関数を用いてtasksのすべてのタスクにアクセスする
       savedTasks.map((savedTask) => {        
         const targetDate = makeTargetDate(savedTask);
         const delay = targetDate.getTime() - Date.now();
 
+        //締切が現在時刻を過ぎている場合は通知済のタスクとして表示する
         if (delay <= 0) {
           setTasks((prevTasks) =>
             prevTasks.map((prevTask) =>
@@ -62,6 +67,7 @@ function App() {
           return;
         };
 
+        //締切を過ぎていない場合は通知を設定し直す
         if (delay > 0) {
           compareDelayMaxtimeoutAndNotify(savedTask, delay);
         };
