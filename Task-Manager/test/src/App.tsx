@@ -18,7 +18,8 @@ function App() {
   --------------------------------------------------*/
 
   //setTimeout関数の遅延時間の上限
-  const MAX_TIMEOUT = 2147483647;
+  //const MAX_TIMEOUT = 2147483647;
+  const MAX_TIMEOUT = 30 * 1000;
 
   //ユーザーの入力を取得し、表示するためのstate
   const [taskName, setTaskName] = useState("");
@@ -62,37 +63,7 @@ function App() {
         };
 
         if (delay > 0) {
-          let taskCycleId: ReturnType <typeof setTimeout>;
-
-          if (delay > MAX_TIMEOUT) {
-            //MAX_TIMEOUT時間だけ経ったあとの残り時間を計算する
-            const remainedDelay: number = delay - MAX_TIMEOUT;
-
-            taskCycleId = setTimeout(() => {
-              //setTimeout関数を用いてMAX_TIMEOUT時間経った後に残り時間をネオスケジュールに渡す
-              neoScheduleNotification(savedTask, remainedDelay);
-            }, MAX_TIMEOUT);
-          } else {
-            //残り時間がMAX_TIMEOUTを超えていないときは通知を設定する
-            taskCycleId = setTimeout(() => {
-              new Notification("タスクの時間です", {
-              body: `${savedTask.name} の期限です`,
-            });
-
-            playNotificationSound();
-
-            //通知を行ったタスクのnotifiedを通知済にする
-            setTasks((prevTasks) =>
-              prevTasks.map((prevTask) =>
-                prevTask.id === savedTask.id ? { ...savedTask, notified: true }: prevTask));
-
-            //通知を行ったあとはキャンセルすることなはいのでMapkからタイマーIDを削除する
-            timersRef.current.delete(savedTask.id);
-            }, delay);
-          };
-
-          //ifのどちらでも通知がキャンセルされたとき用にタイマーIDをセットする必要がある
-          timersRef.current.set(savedTask.id, taskCycleId);
+          compareDelayMaxtimeoutAndNotify(savedTask, delay);
         };
       });
     };
@@ -271,40 +242,7 @@ function App() {
     const targetDate = makeTargetDate(task);
     const delay = targetDate.getTime() - Date.now();
 
-    //taskCycleIdにtimersRefがアクセスできるように外で定義する
-    let taskCycleId: ReturnType <typeof setTimeout>;
-
-    //delayをsetTimeout関数の遅延時間の上限と比較
-    if (delay > MAX_TIMEOUT) {
-      //MAX_TIMEOUT時間だけ経ったあとの残り時間を計算する
-      const remainedDelay: number = delay - MAX_TIMEOUT;
-
-      taskCycleId = setTimeout(() => {
-        //setTimeout関数を用いてMAX_TIMEOUT時間経った後に残り時間をネオスケジュールに渡す
-        neoScheduleNotification(task, remainedDelay);
-      }, MAX_TIMEOUT);
-    } else {
-      //残り時間がMAX_TIMEOUTを超えていないときは通知を設定する
-      taskCycleId = setTimeout(() => {
-      new Notification("タスクの時間です", {
-        body: `${task.name} の期限です`,
-      });
-
-      playNotificationSound();
-
-      //通知を行ったタスクのnotifiedを通知済にする
-      setTasks((prevTasks) =>
-        prevTasks.map((prevTask) =>
-          prevTask.id === task.id ? { ...task, notified: true }: prevTask));
-
-      //通知を行ったあとはキャンセルすることなはいのでMapkからタイマーIDを削除する
-      timersRef.current.delete(task.id);
-      }, delay);
-    };
-
-    //ifのどちらでも通知がキャンセルされたとき用にタイマーIDをセットする必要がある
-    timersRef.current.set(task.id, taskCycleId);
-    //console.log("ハンドル時のMap：", timersRef.current);
+    compareDelayMaxtimeoutAndNotify(task, delay);
   };
   
   
@@ -335,34 +273,7 @@ function App() {
       2,"0")}:${String(notificationDate.getMinutes()).padStart(2, "0")}`;
     updateDeadline(task.id, newDate, newDeadline);
 
-    let taskCycleId: ReturnType <typeof setTimeout>;
-
-    if (delay > MAX_TIMEOUT) {
-      const remainedDelay: number = delay - MAX_TIMEOUT;
-
-      taskCycleId = setTimeout(() => {
-        neoScheduleNotification(task, remainedDelay);
-      }, MAX_TIMEOUT);
-    } else {
-      taskCycleId = setTimeout(() => {
-      new Notification("タスクの時間です", {
-        body: `${task.name} の期限です`,
-      });
-
-      playNotificationSound();
-
-      setTasks((prevTasks) =>
-        prevTasks.map((prevTask) =>
-          prevTask.id === task.id ? { ...prevTask, notified: true }: prevTask));
-
-      //すでに通知済なのでキャンセルするときにIDは必要ない
-      timersRef.current.delete(task.id);
-      }, delay);
-    };
-
-    //ifのどちらでも通知がキャンセルされたとき用にタイマーIDをセットする必要がある
-    timersRef.current.set(task.id, taskCycleId);
-    //console.log("スケジュール時のMap：", timersRef.current);
+    compareDelayMaxtimeoutAndNotify(task, delay);
   };
 
   
@@ -372,34 +283,7 @@ function App() {
     //MAX_TIMEOUTだけ待ったタイマーIDを一応削除する
     cancelNotification(task.id);
 
-    let taskCycleId: ReturnType <typeof setTimeout>;
-
-    if (remainedDelay > MAX_TIMEOUT) {
-      const nextremainedDelay = remainedDelay - MAX_TIMEOUT;
-
-      taskCycleId = setTimeout(() => {
-        neoScheduleNotification(task, nextremainedDelay);
-      }, MAX_TIMEOUT);
-    } else {
-      taskCycleId = setTimeout(() => {
-        new Notification("タスクの時間です", {
-        body: `${task.name} の期限です`,
-      });
-
-      playNotificationSound();
-
-      setTasks((prevTasks) =>
-        prevTasks.map((prevTask) =>
-          prevTask.id === task.id ? { ...prevTask, notified: true }: prevTask));
-
-      timersRef.current.delete(task.id);
-
-      }, remainedDelay);
-    ;}
-
-    //いつでもタイマーをキャンセルできるようにここでもMapにタイマーIDを保存する
-    timersRef.current.set(task.id, taskCycleId);
-    //console.log("ネオスケジュール時のMap：", timersRef.current);
+    compareDelayMaxtimeoutAndNotify(task, remainedDelay);
   };
 
   /*------------------------------------------------
@@ -516,6 +400,46 @@ function App() {
     }
 
     return nextDate;
+  };
+
+
+
+  //通知までの時間とMAX_TIMEOUTを比較して通知をセットする
+  const compareDelayMaxtimeoutAndNotify = (task: Task, delay: number) => {
+    //taskCycleIdにtimersRefがアクセスできるように外で定義する
+    let taskCycleId: ReturnType <typeof setTimeout>;
+
+    //通知までの時間をsetTimeout関数の遅延時間の上限と比較
+    if (delay > MAX_TIMEOUT) {
+      //MAX_TIMEOUT時間だけ経ったあとの残り時間を計算する
+      const remainedDelay: number = delay - MAX_TIMEOUT;
+
+      taskCycleId = setTimeout(() => {
+        //setTimeout関数を用いてMAX_TIMEOUT時間経った後に残り時間をネオスケジュールに渡す
+        neoScheduleNotification(task, remainedDelay);
+      }, MAX_TIMEOUT);
+    } else {
+      //残り時間が上限を超えていないときは通知を設定する
+      taskCycleId = setTimeout(() => {
+      new Notification("タスクの時間です", {
+        body: `${task.name} の期限です`,
+      });
+
+      playNotificationSound();
+
+      //通知を行ったタスクのnotifiedを通知済にする
+      setTasks((prevTasks) =>
+        prevTasks.map((prevTask) =>
+          prevTask.id === task.id ? { ...prevTask, notified: true }: prevTask));
+
+      //通知を行ったあとはキャンセルすることなはいのでMapkからタイマーIDを削除する
+      timersRef.current.delete(task.id);
+      }, delay);
+    };
+
+    //ifのどちらでも通知がキャンセルされたとき用にタイマーIDをセットする必要がある
+    timersRef.current.set(task.id, taskCycleId);
+    //console.log("スケジュール時のMap：", timersRef.current);
   };
   
   
