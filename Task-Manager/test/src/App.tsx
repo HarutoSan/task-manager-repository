@@ -41,37 +41,17 @@ function App() {
     localStorage.setItem("tasks",JSON.stringify(tasks));}, [tasks]);
 
   useEffect(() => {
-    console.log("立ち上げ時のMap：", timersRef.current);
-    const savedLocalStrageTasks = localStorage.getItem("tasks");
-    
-    //ローカルストレージにtasksがないときは何もせずに終了
-    if (!savedLocalStrageTasks) {
-      return;
-    }
+    const reLoadScreenAuto = () => {
+      console.log("リロードテスト");
+      whenStartBrowserCheckTask();
+    };
 
-    //tasksがあるときは各タスクの通知を再設定する
-    if (savedLocalStrageTasks) {
-      const savedTasks: Task[] = JSON.parse(savedLocalStrageTasks);
+    window.addEventListener("focus", reLoadScreenAuto);
+    document.addEventListener("visibilitychange", reLoadScreenAuto);
 
-      //立ち上げた時刻から締切までの時間を計算する
-      //map関数を用いてtasksのすべてのタスクにアクセスする
-      savedTasks.map((savedTask) => {        
-        const targetDate = makeTargetDate(savedTask);
-        const delay = targetDate.getTime() - Date.now();
-
-        //締切が現在時刻を過ぎている場合は通知済のタスクとして表示する
-        if (delay <= 0) {
-          setTasks((prevTasks) =>
-            prevTasks.map((prevTask) =>
-              prevTask.id === savedTask.id ? { ...savedTask, notified: true }: prevTask));
-          return;
-        };
-
-        //締切を過ぎていない場合は通知を設定し直す
-        if (delay > 0) {
-          compareDelayMaxtimeoutAndNotify(savedTask, delay);
-        };
-      });
+    return () => {
+      window.removeEventListener("focus", reLoadScreenAuto);
+      document.removeEventListener("visibilitychange", reLoadScreenAuto);
     };
   }, []);
 
@@ -145,7 +125,44 @@ function App() {
   /*------------------------------------------------
   メインとなる関数
   --------------------------------------------------*/
-  
+
+  const whenStartBrowserCheckTask = () => {
+    console.log("立ち上げ時のMap：", timersRef.current);
+    const savedLocalStrageTasks = localStorage.getItem("tasks");
+    
+    //ローカルストレージにtasksがないときは何もせずに終了
+    if (!savedLocalStrageTasks) {
+      return;
+    }
+
+    //tasksがあるときは各タスクの通知を再設定する
+    if (savedLocalStrageTasks) {
+      const savedTasks: Task[] = JSON.parse(savedLocalStrageTasks);
+
+      //立ち上げた時刻から締切までの時間を計算する
+      //map関数を用いてtasksのすべてのタスクにアクセスする
+      savedTasks.forEach((savedTask) => {        
+        const targetDate = makeTargetDate(savedTask);
+        const delay = targetDate.getTime() - Date.now();
+
+        //締切が現在時刻を過ぎている場合は通知済のタスクとして表示する
+        if (delay <= 0) {
+          setTasks((prevTasks) =>
+            prevTasks.map((prevTask) =>
+              prevTask.id === savedTask.id ? { ...savedTask, notified: true }: prevTask));
+          return;
+        };
+
+        //締切を過ぎていない場合は通知を設定し直す
+        if (delay > 0) {
+          compareDelayMaxtimeoutAndNotify(savedTask, delay);
+        };
+      });
+    };
+  };
+
+
+
   //ユーザーがタスクを追加するボタンを押すとtasksに入力した情報を元にタスクを追加する
   const addTask = () : void => {
     //ユーザーが入力している情報を取得して新たにタスクとして定義する
