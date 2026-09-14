@@ -1,4 +1,4 @@
-import { useState, useRef, type ChangeEvent } from "react";
+import { useState, useRef, useEffect, type ChangeEvent } from "react";
 import { v4 as uuid } from "uuid";
 import TaskList from "./Components/TaskList";
 import "./App.css";
@@ -27,7 +27,17 @@ function App() {
   const [taskCycle, setCycle] = useState("none");
 
   //タスクの根源
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    const savedTasks = localStorage.getItem("tasks");
+
+    if (savedTasks) {
+      return JSON.parse(savedTasks);
+    };
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("tasks",JSON.stringify(tasks));}, [tasks]);
 
   //tasksを締切順でソートしたタスク
   const sortedTasks = [...tasks].sort((a, b) => {
