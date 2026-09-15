@@ -396,7 +396,7 @@ function App() {
     const nextDate = new Date(currentDate);
 
     if (cycle === "day") {
-      nextDate.setDate(nextDate.getDate() + 1);
+      nextDate.setMinutes(nextDate.getMinutes() + 1);
     }
     else if (cycle === "week") {
       nextDate.setDate(nextDate.getDate() + 7);
