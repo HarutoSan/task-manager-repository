@@ -18,8 +18,8 @@ function App() {
   --------------------------------------------------*/
 
   //setTimeout関数の遅延時間の上限
-  //const MAX_TIMEOUT = 2147483647;
-  const MAX_TIMEOUT = 30 * 1000;
+  const MAX_TIMEOUT = 2147483647;
+  //const MAX_TIMEOUT = 30 * 1000;
 
   //ユーザーの入力を取得し、表示するためのstate
   const [taskName, setTaskName] = useState("");
@@ -44,8 +44,12 @@ function App() {
   //立ち上げ時に一度だけ実行する手続き
   useEffect(() => {
     const reLoadScreenAuto = () => {
+      console.log("----------------------");
+      console.log("focusイベント発生");
       whenStartBrowserCheckTask();
     };
+
+    reLoadScreenAuto();
 
     //タブに移動するとreLoadScreenAutoを実行する
     window.addEventListener("focus", reLoadScreenAuto);
@@ -129,10 +133,14 @@ function App() {
 
   //タブに移動したときにローカルストレージを読み直して通知を設定する
   const whenStartBrowserCheckTask = () => {
+    console.log("whenStartBrowserCheckTask 実行");
     const savedLocalStrageTasks = localStorage.getItem("tasks");
+
+    console.log("localStorage:", savedLocalStrageTasks);
     
     //ローカルストレージにtasksがないときは何もせずに終了
     if (!savedLocalStrageTasks) {
+      console.log("保存されたタスクがありません");
       return;
     }
 
@@ -146,8 +154,20 @@ function App() {
         const targetDate = makeTargetDate(savedTask);
         const delay = targetDate.getTime() - Date.now();
 
+        console.log(
+        "タスク:",
+        savedTask.name,
+        "期限:",
+        targetDate,
+        "残り:",
+        delay,
+        "ms"
+        );
+
         //締切が現在時刻を過ぎている場合は通知済のタスクとして表示する
         if (delay <= 0) {
+          console.log("期限を過ぎているので通知済みにします");
+
           setTasks((prevTasks) =>
             prevTasks.map((prevTask) =>
               prevTask.id === savedTask.id ? { ...savedTask, notified: true }: prevTask));
@@ -156,6 +176,8 @@ function App() {
 
         //締切を過ぎていない場合は通知を設定し直す
         if (delay > 0) {
+          console.log("タイマーを再登録します");
+
           compareDelayMaxtimeoutAndNotify(savedTask, delay);
         };
       });
@@ -278,9 +300,6 @@ function App() {
       prevTasks.map((prevTask) =>
         prevTask.id === task.id ? { ...prevTask, notified: false }: prevTask));
 
-    //未通知のタスクを繰り返すときはタイマーが動いたままなのでタイマーを止める
-    cancelNotification(task.id);
-
     //通知までの残り時間を計算する
     let delay: number = notificationDate.getTime() - Date.now();
     //計算した次の締切日時が現在時刻を過ぎていた場合に正しい締切日時に更新する
@@ -304,8 +323,12 @@ function App() {
   
   //遅延時間がMAX_TIMEOUTを超えていたとき用の再帰関数
   const neoScheduleNotification = (task: Task, remainedDelay: number) : void => {
-    //MAX_TIMEOUTだけ待ったタイマーIDを一応削除する
-    cancelNotification(task.id);
+    console.log(
+    "neoScheduleNotification実行:",
+    task.name,
+    "残り:",
+    remainedDelay
+    );
 
     compareDelayMaxtimeoutAndNotify(task, remainedDelay);
   };
@@ -430,6 +453,9 @@ function App() {
 
   //通知までの時間とMAX_TIMEOUTを比較して通知をセットする
   const compareDelayMaxtimeoutAndNotify = (task: Task, delay: number) => {
+    //この関数はいずれタイマーをセットするのですでにタイマーがあるタスクのタイマーは停止する
+    cancelNotification(task.id);
+
     //taskCycleIdにtimersRefがアクセスできるように外で定義する
     let taskCycleId: ReturnType <typeof setTimeout>;
 
@@ -439,6 +465,8 @@ function App() {
       const remainedDelay: number = delay - MAX_TIMEOUT;
 
       taskCycleId = setTimeout(() => {
+        console.log("タイマーが発火:", task.name);
+
         //setTimeout関数を用いてMAX_TIMEOUT時間経った後に残り時間をネオスケジュールに渡す
         neoScheduleNotification(task, remainedDelay);
       }, MAX_TIMEOUT);
@@ -448,6 +476,8 @@ function App() {
       new Notification("タスクの時間です", {
         body: `${task.name} の期限です`,
       });
+
+      console.log("★★★★★ Notificationを実行しました");
 
       playNotificationSound();
 
@@ -460,6 +490,8 @@ function App() {
       timersRef.current.delete(task.id);
       }, delay);
     };
+
+    console.log("タイマーをセット:", task.name, delay);
 
     //ifのどちらでも通知がキャンセルされたとき用にタイマーIDをセットする必要がある
     timersRef.current.set(task.id, taskCycleId);
