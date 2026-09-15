@@ -49,9 +49,10 @@ function App() {
       whenStartBrowserCheckTask();
     };
 
+    //リロードしたあと初めて実行される
     reLoadScreenAuto();
 
-    //タブに移動するとreLoadScreenAutoを実行する
+    //タブに移動するとreLoadScreenAutoを呼び出すように登録する
     window.addEventListener("focus", reLoadScreenAuto);
 
     //別のタブに移動するとフォーカスを失うとする
