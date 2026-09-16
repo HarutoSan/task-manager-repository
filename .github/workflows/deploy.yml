@@ -1,7 +1,12 @@
-name: Task Manager Page
+name: Deploy to GitHub Pages
 
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        description: "デプロイするブランチ"
+        required: true
+        default: "feature-LocalStrage"
 
 permissions:
   contents: read
@@ -23,6 +28,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.branch }}
 
       - name: Setup Node
         uses: actions/setup-node@v6
