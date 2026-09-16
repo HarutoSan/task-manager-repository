@@ -150,6 +150,7 @@ function App() {
 
         //締切が現在時刻を過ぎている場合は通知済のタスクとして表示する
         if (delay <= 0) {
+          cancelNotification(savedTask.id);
 
           setTasks((prevTasks) =>
             prevTasks.map((prevTask) =>
