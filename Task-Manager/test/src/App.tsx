@@ -397,7 +397,7 @@ function App() {
     const nextDate = new Date(currentDate);
 
     if (cycle === "day") {
-      nextDate.setMinutes(nextDate.getMinutes() + 1);
+      nextDate.setDate(nextDate.getDate() + 1);
     }
     else if (cycle === "week") {
       nextDate.setDate(nextDate.getDate() + 7);
@@ -546,7 +546,7 @@ function App() {
 
   //通知音を鳴らす
   const playNotificationSound = () => {
-    const audio = new Audio("/notification.mp3");
+    const audio = new Audio("/task-manager-repository/notification.mp3");
 
     audio.play().catch((error) => {
       console.log("通知音を再生できませんでした:", error);
