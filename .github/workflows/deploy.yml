@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Task Manager Page
 
 on:
   workflow_dispatch:
@@ -29,11 +29,14 @@ jobs:
         with:
           node-version: lts/*
           cache: npm
+          cache-dependency-path: Task-Manager/test/package-lock.json
 
       - name: Install dependencies
+        working-directory: ./Task-Manager/test
         run: npm ci
 
       - name: Build
+        working-directory: ./Task-Manager/test
         run: npm run build
 
       - name: Setup Pages
@@ -42,7 +45,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: ./dist
+          path: ./Task-Manager/test/dist
 
       - name: Deploy to GitHub Pages
         id: deployment
