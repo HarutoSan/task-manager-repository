@@ -18,8 +18,8 @@ function App() {
   --------------------------------------------------*/
 
   //setTimeout関数の遅延時間の上限
-  //const MAX_TIMEOUT = 2147483647;
-  const MAX_TIMEOUT = 30 * 1000;
+  const MAX_TIMEOUT = 2147483647;
+  //const MAX_TIMEOUT = 30 * 1000;
 
   //ユーザーの入力を取得し、表示するためのstate
   const [taskName, setTaskName] = useState("");
@@ -306,6 +306,7 @@ function App() {
     //この関数はいずれタイマーをセットするのですでにタイマーがあるタスクのタイマーは停止する
     cancelNotification(task.id);
 
+    //この関数を実行した時点ですでに締切日時を過ぎていたら通知を行う
     if (delay <= 0) {
       excuteTaskNotify(task);
       return;
@@ -354,7 +355,7 @@ function App() {
     setTasks((prevTasks) =>
       prevTasks.map((prevTask) =>
         prevTask.id === task.id
-          ? { ...prevTask, notified: true }: prevTask));
+          ? { ...prevTask, notified: true } : prevTask));
 
     timersRef.current.delete(task.id);
   };
