@@ -38,8 +38,7 @@ function App() {
   });
 
   //tasksの変更をローカルストレージにも反映する
-  useEffect(() => {
-    localStorage.setItem("tasks",JSON.stringify(tasks));}, [tasks]);
+  useEffect(() => {localStorage.setItem("tasks",JSON.stringify(tasks));}, [tasks]);
 
   //立ち上げ時に一度だけ実行する手続き
   useEffect(() => {
@@ -162,7 +161,7 @@ function App() {
 
         //締切を過ぎていない場合は通知を設定し直す
         if (delay > 0) {
-          compareDelayMaxtimeoutAndNotify(savedTask, targetDate);
+          compareDelayMaxtimeout(savedTask, targetDate);
         };
       });
     };
@@ -269,9 +268,8 @@ function App() {
 
     //締切日時までの時間を計算する
     const targetDate = makeTargetDate(task);
-    const delay = targetDate.getTime() - Date.now();
 
-    compareDelayMaxtimeoutAndNotify(task, targetDate);
+    compareDelayMaxtimeout(task, targetDate);
   };
   
   
@@ -292,38 +290,24 @@ function App() {
     };
 
     //dateとdeadlineを締切日時から取得して画面の締切日時を更新する
-    const newDate = `${notificationDate.getFullYear()}-${String(
-      notificationDate.getMonth() + 1
-    ).padStart(2, "0")}-${String(notificationDate.getDate()).padStart(2, "0")}`;   
-    const newDeadline = `${String(notificationDate.getHours()).padStart(
-      2,"0")}:${String(notificationDate.getMinutes()).padStart(2, "0")}`;
+    const newDate = `${notificationDate.getFullYear()}-${String(notificationDate.getMonth() + 1).padStart(2, "0")}-${String(notificationDate.getDate()).padStart(2, "0")}`;   
+    const newDeadline = `${String(notificationDate.getHours()).padStart(2,"0")}:${String(notificationDate.getMinutes()).padStart(2, "0")}`;
     updateDeadline(task.id, newDate, newDeadline);
 
-    compareDelayMaxtimeoutAndNotify(task, notificationDate);
+    compareDelayMaxtimeout(task, notificationDate);
   };
 
 
 
   //通知までの時間とMAX_TIMEOUTを比較して通知をセットする
-  const compareDelayMaxtimeoutAndNotify = (task: Task, targetDate: Date) => {
+  const compareDelayMaxtimeout = (task: Task, targetDate: Date) => {
     const delay = targetDate.getTime() - Date.now();
-
-    console.log(
-    "タイマー設定:",
-    task.name,
-    "残り:",
-    delay / 1000,
-    "秒"
-    );
 
     //この関数はいずれタイマーをセットするのですでにタイマーがあるタスクのタイマーは停止する
     cancelNotification(task.id);
 
     if (delay <= 0) {
-      console.log("期限を過ぎています。すぐに通知します。");
-
-      notifyTask(task);
-
+      excuteTaskNotify(task);
       return;
     };
 
@@ -332,31 +316,25 @@ function App() {
 
     //通知までの時間をsetTimeout関数の遅延時間の上限と比較
     if (delay > MAX_TIMEOUT) {
-      //MAX_TIMEOUT時間だけ経ったあとの残り時間を計算する
-      const remainedDelay: number = delay - MAX_TIMEOUT;
-
-      const timerSetAt = Date.now();
-
+      //setTimeout関数を用いてMAX_TIMEOUT時間経った後に残り時間をネオスケジュールに渡す
       taskCycleId = setTimeout(() => {
-        const elapsed = (Date.now() - timerSetAt) / 1000;
-
-        //setTimeout関数を用いてMAX_TIMEOUT時間経った後に残り時間をネオスケジュールに渡す
-        compareDelayMaxtimeoutAndNotify(task, targetDate);
+        compareDelayMaxtimeout(task, targetDate);
       }, MAX_TIMEOUT);
+
     } else {
       taskCycleId = setTimeout(() => {
-        // タイマーが遅れて実行された可能性があるので
-        // もう一度期限との差を確認する
-        const remaining = targetDate.getTime() - Date.now();
+        //タイマーが遅れて実行された可能性があるのでもう一度期限との差を確認する
+        const latestDelay = targetDate.getTime() - Date.now();
 
-        if (remaining > 0) {
-          // まだ期限前なら、もう一度タイマーを設定
-          compareDelayMaxtimeoutAndNotify(task,targetDate);
+        //万が一リソースが節約されたとき用の保険
+        if (latestDelay > 0) {
+          //まだ期限前なら、もう一度タイマーを設定
+          compareDelayMaxtimeout(task,targetDate);
           return;
         };
 
-        // 期限を過ぎていたら通知
-        notifyTask(task);
+        //期限を過ぎていたら通知
+        excuteTaskNotify(task);
 
       }, delay);
     };
@@ -366,30 +344,20 @@ function App() {
 
 
 
-  const notifyTask = (task: Task) => {
-  console.log(
-    "通知を実行:",
-    new Date().toLocaleTimeString()
-  );
+  const  excuteTaskNotify = (task: Task) => {
+    new Notification("タスクの時間です", {
+      body: `${task.name} の期限です`,
+    });
 
-  new Notification("タスクの時間です", {
-    body: `${task.name} の期限です`,
-  });
+    playNotificationSound();
 
-  console.log("Notificationを作成しました");
+    setTasks((prevTasks) =>
+      prevTasks.map((prevTask) =>
+        prevTask.id === task.id
+          ? { ...prevTask, notified: true }: prevTask));
 
-  playNotificationSound();
-
-  setTasks((prevTasks) =>
-    prevTasks.map((prevTask) =>
-      prevTask.id === task.id
-        ? { ...prevTask, notified: true }
-        : prevTask
-    )
-  );
-
-  timersRef.current.delete(task.id);
-};
+    timersRef.current.delete(task.id);
+  };
 
   /*------------------------------------------------
   メインとなる関数
