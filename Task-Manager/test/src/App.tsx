@@ -335,68 +335,31 @@ function App() {
       //MAX_TIMEOUT時間だけ経ったあとの残り時間を計算する
       const remainedDelay: number = delay - MAX_TIMEOUT;
 
-      console.log(
-      "30秒タイマーを設定。次の残り時間:",
-      remainedDelay / 1000,
-      "秒"
-      );
-
-      console.log(
-      "タイマー設定時刻:",
-      new Date().toLocaleTimeString()
-      );
-
       const timerSetAt = Date.now();
 
       taskCycleId = setTimeout(() => {
         const elapsed = (Date.now() - timerSetAt) / 1000;
 
-
-        console.log(
-        "タイマー実行時刻:",
-        new Date().toLocaleTimeString()
-        );
-
-        console.log(
-        "実際の経過時間:",
-        elapsed,
-        "秒"
-        );
-
-        console.log(
-        "30秒タイマーが実行されました"
-        );
-
         //setTimeout関数を用いてMAX_TIMEOUT時間経った後に残り時間をネオスケジュールに渡す
         compareDelayMaxtimeoutAndNotify(task, targetDate);
       }, MAX_TIMEOUT);
     } else {
-      console.log(
-      "最終タイマーを設定:",
-      delay / 1000,
-      "秒後"
-      );
-
       taskCycleId = setTimeout(() => {
         // タイマーが遅れて実行された可能性があるので
         // もう一度期限との差を確認する
         const remaining = targetDate.getTime() - Date.now();
 
-      console.log("最終タイマー実行:", new Date().toLocaleTimeString());
+        if (remaining > 0) {
+          // まだ期限前なら、もう一度タイマーを設定
+          compareDelayMaxtimeoutAndNotify(task,targetDate);
+          return;
+        };
 
-      console.log("期限までの残り:", remaining / 1000, "秒");
-
-      if (remaining > 0) {
-        // まだ期限前なら、もう一度タイマーを設定
-        compareDelayMaxtimeoutAndNotify(task,targetDate);
-        return;
-      }
-
-      // 期限を過ぎていたら通知
-      notifyTask(task);
+        // 期限を過ぎていたら通知
+        notifyTask(task);
 
       }, delay);
-    }
+    };
     
     timersRef.current.set(task.id, taskCycleId);
   };
