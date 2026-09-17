@@ -18,7 +18,8 @@ function App() {
   --------------------------------------------------*/
 
   //setTimeout関数の遅延時間の上限
-  const MAX_TIMEOUT = 2147483647;
+  //const MAX_TIMEOUT = 2147483647;
+  const MAX_TIMEOUT = 30 * 1000;
 
   //ユーザーの入力を取得し、表示するためのstate
   const [taskName, setTaskName] = useState("");
@@ -43,6 +44,7 @@ function App() {
   //立ち上げ時に一度だけ実行する手続き
   useEffect(() => {
     const reLoadScreenAuto = () => {
+      console.log("リロードしました");
       whenStartBrowserCheckTask();
     };
 
@@ -160,7 +162,7 @@ function App() {
 
         //締切を過ぎていない場合は通知を設定し直す
         if (delay > 0) {
-          compareDelayMaxtimeoutAndNotify(savedTask, delay);
+          compareDelayMaxtimeoutAndNotify(savedTask, targetDate);
         };
       });
     };
@@ -269,7 +271,7 @@ function App() {
     const targetDate = makeTargetDate(task);
     const delay = targetDate.getTime() - Date.now();
 
-    compareDelayMaxtimeoutAndNotify(task, delay);
+    compareDelayMaxtimeoutAndNotify(task, targetDate);
   };
   
   
@@ -297,15 +299,134 @@ function App() {
       2,"0")}:${String(notificationDate.getMinutes()).padStart(2, "0")}`;
     updateDeadline(task.id, newDate, newDeadline);
 
-    compareDelayMaxtimeoutAndNotify(task, delay);
+    compareDelayMaxtimeoutAndNotify(task, notificationDate);
   };
 
-  
-  
-  //遅延時間がMAX_TIMEOUTを超えていたとき用の再帰関数
-  const neoScheduleNotification = (task: Task, remainedDelay: number) : void => {
-    compareDelayMaxtimeoutAndNotify(task, remainedDelay);
+
+
+  //通知までの時間とMAX_TIMEOUTを比較して通知をセットする
+  const compareDelayMaxtimeoutAndNotify = (task: Task, targetDate: Date) => {
+    const delay = targetDate.getTime() - Date.now();
+
+    console.log(
+    "タイマー設定:",
+    task.name,
+    "残り:",
+    delay / 1000,
+    "秒"
+    );
+
+    //この関数はいずれタイマーをセットするのですでにタイマーがあるタスクのタイマーは停止する
+    cancelNotification(task.id);
+
+    if (delay <= 0) {
+      console.log("期限を過ぎています。すぐに通知します。");
+
+      notifyTask(task);
+
+      return;
+    };
+
+    //taskCycleIdにtimersRefがアクセスできるように外で定義する
+    let taskCycleId: ReturnType <typeof setTimeout>;
+
+    //通知までの時間をsetTimeout関数の遅延時間の上限と比較
+    if (delay > MAX_TIMEOUT) {
+      //MAX_TIMEOUT時間だけ経ったあとの残り時間を計算する
+      const remainedDelay: number = delay - MAX_TIMEOUT;
+
+      console.log(
+      "30秒タイマーを設定。次の残り時間:",
+      remainedDelay / 1000,
+      "秒"
+      );
+
+      console.log(
+      "タイマー設定時刻:",
+      new Date().toLocaleTimeString()
+      );
+
+      const timerSetAt = Date.now();
+
+      taskCycleId = setTimeout(() => {
+        const elapsed = (Date.now() - timerSetAt) / 1000;
+
+
+        console.log(
+        "タイマー実行時刻:",
+        new Date().toLocaleTimeString()
+        );
+
+        console.log(
+        "実際の経過時間:",
+        elapsed,
+        "秒"
+        );
+
+        console.log(
+        "30秒タイマーが実行されました"
+        );
+
+        //setTimeout関数を用いてMAX_TIMEOUT時間経った後に残り時間をネオスケジュールに渡す
+        compareDelayMaxtimeoutAndNotify(task, targetDate);
+      }, MAX_TIMEOUT);
+    } else {
+      console.log(
+      "最終タイマーを設定:",
+      delay / 1000,
+      "秒後"
+      );
+
+      taskCycleId = setTimeout(() => {
+        // タイマーが遅れて実行された可能性があるので
+        // もう一度期限との差を確認する
+        const remaining = targetDate.getTime() - Date.now();
+
+      console.log("最終タイマー実行:", new Date().toLocaleTimeString());
+
+      console.log("期限までの残り:", remaining / 1000, "秒");
+
+      if (remaining > 0) {
+        // まだ期限前なら、もう一度タイマーを設定
+        compareDelayMaxtimeoutAndNotify(task,targetDate);
+        return;
+      }
+
+      // 期限を過ぎていたら通知
+      notifyTask(task);
+
+      }, delay);
+    }
+    
+    timersRef.current.set(task.id, taskCycleId);
   };
+
+
+
+  const notifyTask = (task: Task) => {
+  console.log(
+    "通知を実行:",
+    new Date().toLocaleTimeString()
+  );
+
+  new Notification("タスクの時間です", {
+    body: `${task.name} の期限です`,
+  });
+
+  console.log("Notificationを作成しました");
+
+  playNotificationSound();
+
+  setTasks((prevTasks) =>
+    prevTasks.map((prevTask) =>
+      prevTask.id === task.id
+        ? { ...prevTask, notified: true }
+        : prevTask
+    )
+  );
+
+  timersRef.current.delete(task.id);
+};
 
   /*------------------------------------------------
   メインとなる関数
@@ -370,7 +491,7 @@ function App() {
     const nextDate = new Date(currentDate);
 
     if (cycle === "day") {
-      nextDate.setDate(nextDate.getDate() + 1);
+      nextDate.setMinutes(nextDate.getMinutes() + 1);
     }
     else if (cycle === "week") {
       nextDate.setDate(nextDate.getDate() + 7);
@@ -422,51 +543,6 @@ function App() {
 
     return nextDate;
   };
-
-
-
-  //通知までの時間とMAX_TIMEOUTを比較して通知をセットする
-  const compareDelayMaxtimeoutAndNotify = (task: Task, delay: number) => {
-    //この関数はいずれタイマーをセットするのですでにタイマーがあるタスクのタイマーは停止する
-    cancelNotification(task.id);
-
-    //taskCycleIdにtimersRefがアクセスできるように外で定義する
-    let taskCycleId: ReturnType <typeof setTimeout>;
-
-    //通知までの時間をsetTimeout関数の遅延時間の上限と比較
-    if (delay > MAX_TIMEOUT) {
-      //MAX_TIMEOUT時間だけ経ったあとの残り時間を計算する
-      const remainedDelay: number = delay - MAX_TIMEOUT;
-
-      taskCycleId = setTimeout(() => {
-        //setTimeout関数を用いてMAX_TIMEOUT時間経った後に残り時間をネオスケジュールに渡す
-        neoScheduleNotification(task, remainedDelay);
-      }, MAX_TIMEOUT);
-    } else {
-      //残り時間が上限を超えていないときは通知を設定する
-      taskCycleId = setTimeout(() => {
-      new Notification("タスクの時間です", {
-        body: `${task.name} の期限です`,
-      });
-
-      console.log("★★★★★ Notificationを実行しました");
-
-      playNotificationSound();
-
-      //通知を行ったタスクのnotifiedを通知済にする
-      setTasks((prevTasks) =>
-        prevTasks.map((prevTask) =>
-          prevTask.id === task.id ? { ...prevTask, notified: true }: prevTask));
-
-      //通知を行ったあとはキャンセルすることなはいのでMapkからタイマーIDを削除する
-      timersRef.current.delete(task.id);
-      }, delay);
-    };
-
-    //ifのどちらでも通知がキャンセルされたとき用にタイマーIDをセットする必要がある
-    timersRef.current.set(task.id, taskCycleId);
-    //console.log("スケジュール時のMap：", timersRef.current);
-  };
   
   
   //タスクを繰り返したときに画面の締切日時を更新するか
@@ -515,7 +591,7 @@ function App() {
 
   //通知音を鳴らす
   const playNotificationSound = () => {
-    const audio = new Audio("/task-manager-repository/notification.mp3");
+    const audio = new Audio(`${import.meta.env.BASE_URL}notification.mp3`);
 
     audio.play().catch((error) => {
       console.log("通知音を再生できませんでした:", error);
