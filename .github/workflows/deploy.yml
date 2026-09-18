@@ -6,7 +6,7 @@ on:
       branch:
         description: "デプロイするブランチ"
         required: true
-        default: "test"
+        default: "feature-LocalStrage"
 
 permissions:
   contents: read
