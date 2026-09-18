@@ -19,7 +19,6 @@ function App() {
 
   //setTimeout関数の遅延時間の上限
   const MAX_TIMEOUT = 2147483647;
-  //const MAX_TIMEOUT = 30 * 1000;
 
   //ユーザーの入力を取得し、表示するためのstate
   const [taskName, setTaskName] = useState("");
@@ -423,7 +422,7 @@ function App() {
     const nextDate = new Date(currentDate);
 
     if (cycle === "day") {
-      nextDate.setMinutes(nextDate.getMinutes() + 1);
+      nextDate.setDate(nextDate.getDate() + 1);
     }
     else if (cycle === "week") {
       nextDate.setDate(nextDate.getDate() + 7);
